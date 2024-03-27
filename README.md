@@ -15,3 +15,8 @@ LLM-based ticketing system
 - 0 [elicina@access2 ]$ exit (Get out of cluster)
 
 PYTHON Tutorial: https://github.com/ULHPC/tutorials/tree/devel/python/basics
+
+
+DATASET CODE:
+- https://www.kaggle.com/code/nezukokamaado/customer-dashboard-beginner-project
+- https://www.kaggle.com/code/huynhquochiep/support-ticket-sentiment-eda
