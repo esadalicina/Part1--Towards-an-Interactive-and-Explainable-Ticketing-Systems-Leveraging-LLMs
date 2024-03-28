@@ -20,3 +20,21 @@ PYTHON Tutorial: https://github.com/ULHPC/tutorials/tree/devel/python/basics
 DATASET CODE:
 - https://www.kaggle.com/code/nezukokamaado/customer-dashboard-beginner-project
 - https://www.kaggle.com/code/huynhquochiep/support-ticket-sentiment-eda
+
+BASELINE CODE:
+- https://github.com/Kavitha-Kothandaraman/Automatic-IT-Ticket-Assignment-NLP
+- https://github.com/IBM/support-ticket-classification
+- https://monkeylearn.com/blog/ticket-classification-with-ai/
+- https://github.com/sukhijapiyush/NLP-Case-Study---Automatic-Ticket-Classification
+- https://github.com/yipinlyu/IT-Support-Tickets-Optimization-with-Machine-Learning
+- https://medium.com/@karthikkumar_57917/it-support-ticket-classification-using-machine-learning-and-ml-model-deployment-ba694c01e416
+- https://www.kaggle.com/models
+
+WEBSITE CODE:
+- https://github.com/evereux/flicket
+- https://github.com/django-helpdesk/django-helpdesk
+- https://www.udemy.com/course/wayscript-ticketing-application/
+- https://www.freeprojectz.com/python-django-mysql-project-download/helpdesk-ticketing-system
+- https://dev.to/wayscript/tutorial-build-an-employee-help-desk-ticketing-system-2lbb
+- FRAG BING COPOLIT
+
