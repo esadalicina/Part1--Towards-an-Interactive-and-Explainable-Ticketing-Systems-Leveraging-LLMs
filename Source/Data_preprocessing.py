@@ -22,7 +22,7 @@ ticket = pd.read_csv('/Users/esada/Documents/UNI.lu/MICS/Sem3/Master-Thesis/Data
 
 # ----------------------------------------------------- Data Analysis ------------------------------------------------
 
-print(tabulate(ticket.head(), headers='keys', tablefmt='pretty'))
+print(tabulate(ticket.head(50), headers='keys', tablefmt='pretty'))
 print(tabulate(ticket.tail(), headers='keys', tablefmt='pretty'))
 
 print('No of rows:\033[1m', ticket.shape[0], '\033[0m')
