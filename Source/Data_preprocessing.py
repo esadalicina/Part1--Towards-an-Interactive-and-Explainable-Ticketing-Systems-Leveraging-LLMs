@@ -18,7 +18,7 @@ nltk.download('punkt')
 nltk.download('stopwords')
 
 # Load the dataset
-ticket = pd.read_csv('/Users/esada/Documents/UNI.lu/MICS/Sem3/Master-Thesis/Dataset/customer_support_tickets.csv')
+ticket = pd.read_csv('/Users/esada/Documents/UNI.lu/MICS/Sem3/Master-Thesis/Dataset/new_dataset_with_ticket_description.csv')
 
 # ----------------------------------------------------- Data Analysis ------------------------------------------------
 
@@ -33,11 +33,12 @@ print(ticket.describe())
 
 # ----------------------------------------------------- Data Cleaning ------------------------------------------------
 
-columns_to_remove = ['First Response Time', 'Time to Resolution', 'Customer Satisfaction Rating', 'Date of Purchase',
-                     'Customer Age', 'Customer Gender']
-df = ticket.drop(columns=columns_to_remove)
+#columns_to_remove = ['First Response Time', 'Time to Resolution', 'Customer Satisfaction Rating', 'Date of Purchase',
+                     #'Customer Age', 'Customer Gender']
+#df = ticket.drop(columns=columns_to_remove)
 
-df['Ticket Description'] = df.apply(lambda row: row['Ticket Description'].replace('{product_purchased}', str(row['Product Purchased'])), axis=1)
+ticket['Ticket Description'] = ticket.apply(lambda row: row['Ticket Description'].replace('{product_purchased}', str(row['Product Purchased'])), axis=1)
+
 
 
 # Define a function for cleaning text
@@ -54,17 +55,18 @@ def clean_text(text):
 
 
 # Apply the cleaning function to the 'Ticket Description' column
-df['Cleaned_Description'] = df['Ticket Description'].apply(clean_text)
+ticket['Cleaned_Description'] = ticket['Ticket Description'].apply(clean_text)
 
-print(df['Cleaned_Description'])
+print(ticket['Cleaned_Description'])
 
-unique_counts = df['Ticket Type'].value_counts()
+unique_counts = ticket['Ticket Type'].value_counts()
 
 # Print the unique value counts
 print(unique_counts)
 
 
 # ----------------------------------------------------- Model Selection ------------------------------------------------
+
 
 
 # ----------------------------------------------------- Feature Extraction --------------------------------------------
