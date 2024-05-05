@@ -1,16 +1,17 @@
 import pandas as pd
 import plotly.express as px
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
-# importing libraries required for model building and evaluation
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import MultinomialNB
 from xgboost import XGBClassifier
-from sklearn.model_selection import StratifiedKFold,GridSearchCV,train_test_split
-from sklearn.metrics import roc_auc_score,accuracy_score,precision_score,recall_score,f1_score,classification_report
-from sklearn.metrics import confusion_matrix,ConfusionMatrixDisplay
+from sklearn.model_selection import StratifiedKFold, GridSearchCV, train_test_split
+from sklearn.metrics import roc_auc_score, accuracy_score, precision_score, recall_score, f1_score, classification_report
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
+
+# --------------------- Supervised model to predict any new complaints to the relevant Topics --------------------------
 
 # Specify the file path of your CSV file
 file_path = '../../Dataset/Cleaned_Dataset.csv'
@@ -18,27 +19,29 @@ file_path = '../../Dataset/Cleaned_Dataset.csv'
 # Read the CSV file into a DataFrame
 df_clean = pd.read_csv(file_path)
 
-#Keep the columns"complaint_what_happened" & "Topic" only in the new dataframe --> training_data
-training_data=df_clean[['complaint_what_happened','Topic']]
+# Keep the columns"complaint_what_happened" & "Topic" only in the new dataframe --> training_data
+training_data = df_clean[['complaint_what_happened','Topic']]
 
 # Display the first few rows of the DataFrame
 print(training_data.head())
 
-count_vect=CountVectorizer()
-#Write your code to get the Vector count
-X_train_counts=count_vect.fit_transform(training_data['complaint_what_happened'])
-#Write your code here to transform the word vector to tf-idf
-tfidf_transformer=TfidfTransformer()
-X_train_tf=tfidf_transformer.fit_transform(X_train_counts)
+count_vect = CountVectorizer()
+
+# Write your code to get the Vector count
+X_train_counts = count_vect.fit_transform(training_data['complaint_what_happened'])
+
+# Write your code here to transform the word vector to tf-idf
+tfidf_transformer = TfidfTransformer()
+X_train_tf = tfidf_transformer.fit_transform(X_train_counts)
 
 # Checking for class imbalance
 px.bar(x=training_data['Topic'].value_counts().index, y=training_data['Topic'].value_counts().values/max(training_data['Topic'].value_counts().values), title='Class Imbalance')
 
-
 # Prepare the training and test data
 train_X, test_X, train_y, test_y = train_test_split(X_train_tf, training_data['Topic'], test_size=0.2, random_state=40)
 
-# function to evaluate the model and display the results
+
+# Function to evaluate the model and display the results
 def eval_model(y_test,y_pred,y_pred_proba,type='Training'):
     print(type,'results')
     print('Accuracy: ', accuracy_score(y_test,y_pred).round(2))
@@ -51,7 +54,8 @@ def eval_model(y_test,y_pred,y_pred_proba,type='Training'):
     disp = ConfusionMatrixDisplay(confusion_matrix=cm,display_labels=training_data['Topic'].unique())
     disp.plot()
 
-# function to grid search the best parameters for the model
+
+# Function to grid search the best parameters for the model
 def run_model(model,param_grid):
     cv=StratifiedKFold(n_splits=5,shuffle=True,random_state=40)
     grid=GridSearchCV(model,param_grid={},cv=cv,scoring='f1_weighted',verbose=1,n_jobs=-1)
@@ -59,7 +63,9 @@ def run_model(model,param_grid):
     return grid.best_estimator_
 
 
-#running and evaluating the Logistic Regression model
+# ---------------------------------------------- 1. Logistic Regression ------------------------------------------------
+
+# Running and evaluating the Logistic Regression model
 params = {
     'C': [0.001, 0.01, 0.1, 1, 10, 100],
     'penalty': ['l1', 'l2', 'elasticnet', 'none'],
@@ -72,10 +78,9 @@ eval_model(train_y,model.predict(train_X),model.predict_proba(train_X),type='Tra
 eval_model(test_y,model.predict(test_X),model.predict_proba(test_X),type='Test')
 
 
+# --------------------------------------------------- 2. Decision Tree ------------------------------------------------
 
-
-
-#running and evaluating the Decision Tree model
+# Running and evaluating the Decision Tree model
 params = {
     'criterion': ['gini', 'entropy'],
     'splitter': ['best', 'random'],
@@ -88,9 +93,9 @@ model=run_model(DecisionTreeClassifier(),params)
 eval_model(train_y,model.predict(train_X),model.predict_proba(train_X),type='Training')
 eval_model(test_y,model.predict(test_X),model.predict_proba(test_X),type='Test')
 
+# --------------------------------------------------- 3. Random Forest ------------------------------------------------
 
-
-#running and evaluating the Random Forest model
+# Running and evaluating the Random Forest model
 params = {
     'n_estimators': [10, 50, 100, 200, 500],
     'criterion': ['gini', 'entropy'],
@@ -105,8 +110,9 @@ eval_model(train_y,model.predict(train_X),model.predict_proba(train_X),type='Tra
 eval_model(test_y,model.predict(test_X),model.predict_proba(test_X),type='Test')
 
 
+# ------------------------------------------ 4. Multinomial Naive Bayes ------------------------------------------------
 
-#running and evaluating the Gaussian Naive Bayes model
+# Running and evaluating the Gaussian Naive Bayes model
 params = {
     'alpha': [0.1, 0.5, 1, 2, 5],
     'fit_prior': [True, False]
@@ -116,7 +122,9 @@ eval_model(train_y,model.predict(train_X),model.predict_proba(train_X),type='Tra
 eval_model(test_y,model.predict(test_X),model.predict_proba(test_X),type='Test')
 
 
-#running and evaluating the XGBoost model
+# ----------------------------------------------- 5. XGBoost Classifier ------------------------------------------------
+
+# Running and evaluating the XGBoost model
 params = {
     'n_estimators': [100, 200, 500],
     'max_depth': [3, 5, 7],
@@ -130,6 +138,8 @@ model=run_model(XGBClassifier(),params)
 eval_model(train_y,model.predict(train_X),model.predict_proba(train_X),type='Training')
 eval_model(test_y,model.predict(test_X),model.predict_proba(test_X),type='Test')
 
+
+# --------------------------------------------------- Conclusion -------------------------------------------------------
 
 # Applying the best model on the Custom Text
 # We will use the XGBoost model as it has the best performance
@@ -148,6 +158,13 @@ def predict_lr(text):
     predicted = model.predict(X_new_tfidf)
     return Topic_names[predicted[0]]
 
+
 df_complaints['tag'] = df_complaints['complaints'].apply(lambda x: predict_lr([x]))
 print(df_complaints)
+
+
+
+""" TO DO """
+""" CREATING A FUNCTION WHO CLASSIFIES CURRENT NEW TICKETS AND CHECKS IF THE GIVEN CATEGORY FROM THE USER IS SAME 
+AS FROM THE MODEL PREDICTION AND IF MAKES A SECOND SUBCATEGORY CLASS FOR THE TICKET"""
 

@@ -1,0 +1,31 @@
+TOMORROW 6.05.2024:
+
+- Create a simple website for ticketing requests.
+  It should have a priority, a category and a description field.
+  On the right side, should be a ticket solution suggestion.
+
+- Ask ChatGOT to create some solution to the tickets.
+
+- Create a code to check the chosen category of the user and display real time solutions of this category
+  When writing the description, the code will also take tags from the field and look for solutions of those tags.
+
+- Write a code who sends the ticket to the server and displays the ticket status.
+
+- Write code to classify current ticket and checks if the ticket as a second category from the user if yes,
+  then it will make it as a sub category and assign it to the agent.
+
+- Write a code which creates a connection with an Group server like discord and sends the ticket to the corresponding channel.
+
+
+
+OPENAI Solutions:
+
+- Automated Responses: Use the AI to generate initial responses or suggestions for common ticket types.
+            Human agents can then review and modify these responses as needed before sending them to users.
+- Information Retrieval: AI can help agents quickly retrieve relevant information from knowledge bases or
+                         documentation to assist with ticket resolution.
+- Chatbots: Implement chatbots for initial triage and basic troubleshooting.
+          Chatbots can engage with users in real-time, gather necessary information, and either provide solutions or escalate complex issues to human agents.
+- Discord has bots in it so use it for tasks
+- Build channels and into that channels, build priority queues and assign tickets to the queues.
+- Build also an conversation queue for the agents.
