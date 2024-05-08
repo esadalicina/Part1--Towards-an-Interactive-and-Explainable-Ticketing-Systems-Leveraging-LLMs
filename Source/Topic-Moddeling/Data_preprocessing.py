@@ -191,3 +191,4 @@ df_clean['Complaint_clean'] = df_clean['Complaint_clean'].str.replace('xxxx', ''
 
 # All masked texts has been removed
 print(tabulate(df_clean.head(), headers='keys', tablefmt='pretty'))
+
