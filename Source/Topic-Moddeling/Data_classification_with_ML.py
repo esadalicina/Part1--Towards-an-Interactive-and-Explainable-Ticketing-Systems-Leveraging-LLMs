@@ -9,7 +9,7 @@ from xgboost import XGBClassifier
 from sklearn.model_selection import StratifiedKFold, GridSearchCV, train_test_split
 from sklearn.metrics import roc_auc_score, accuracy_score, precision_score, recall_score, f1_score, classification_report
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
-
+import joblib
 
 # --------------------- Supervised model to predict any new complaints to the relevant Topics --------------------------
 
@@ -163,8 +163,8 @@ df_complaints['tag'] = df_complaints['complaints'].apply(lambda x: predict_lr([x
 print(df_complaints)
 
 
+# ---------------------------------------------- 6. Save Model --------------------------------------------------
 
-""" TO DO """
-""" CREATING A FUNCTION WHO CLASSIFIES CURRENT NEW TICKETS AND CHECKS IF THE GIVEN CATEGORY FROM THE USER IS SAME 
-AS FROM THE MODEL PREDICTION AND IF MAKES A SECOND SUBCATEGORY CLASS FOR THE TICKET"""
+# Save the model
+# joblib.dump(model, '/Users/esada/Documents/UNI.lu/MICS/Master-Thesis/Model/xgb_model.pkl')
 
