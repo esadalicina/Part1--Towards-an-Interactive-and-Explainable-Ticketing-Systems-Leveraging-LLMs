@@ -1,8 +1,8 @@
-
-
 import streamlit as st
 import pandas as pd
+from New_Ticket_Classification import predict_lr
 import random
+
 
 # Function to retrieve ticket solutions from the dataset
 def get_ticket_solutions(category, description, df):
@@ -14,10 +14,10 @@ def get_ticket_solutions(category, description, df):
         # Fetch random solutions
         return df[["Topic_category", "Resolution", "complaint_what_happened"]].sample(n=5).values.tolist()  # Fetch 5 random solutions
 
+
 def main():
     # Solution suggestions
     st.sidebar.header("Solution Suggestions")
-    suggestion = st.sidebar.empty()
 
     # Ticket submission form
     st.header("Ticket Submission")
@@ -30,7 +30,7 @@ def main():
         "Credit card or prepaid card": "Description for Credit card or prepaid card.",
         "Theft/Dispute Reporting": "Description for Theft/Dispute Reporting.",
         "Mortgage/Loan": "Description for Mortgage/Loan.",
-        "Other": "Description for Other."
+        "Others": "Description for Other."
     }
 
     # Display category descriptions when hovering over category
@@ -39,6 +39,14 @@ def main():
     # Initialize session state for selected_category
     if "selected_category" not in st.session_state:
         st.session_state.selected_category = None
+
+    # Initialize session state for selected_category
+    if "category_user" not in st.session_state:
+        st.session_state.category_user = False
+
+    # Initialize session state for selected_category
+    if "category_pred" not in st.session_state:
+        st.session_state.category_pred = False
 
     # Display category description based on selected category
     category_description = category_descriptions.get(category, "")
@@ -65,6 +73,18 @@ def main():
                 with st.sidebar.expander(expander_title, expanded=False):
                     st.write(solution)
 
+    if st.session_state.selected_category and description:
+        # Classify the ticket
+        predicted_category = predict_lr([description])
+
+        # If selected category differs from predicted category, ask for confirmation
+        if st.session_state.selected_category != predicted_category:
+            # Render radio buttons for category confirmation
+            st.write("The program predicted that the category is:", predicted_category)
+            st.write("Please check your ticket again.")
+
+            choice = st.radio("Please select the correct category:",
+                              options=[st.session_state.selected_category, predicted_category])
 
     # Conditionally set CSS style to disable the submit button
     button_disabled = not (st.session_state.selected_category and description)
@@ -82,9 +102,11 @@ def main():
     else:
         if st.button("Submit"):
             st.success("Ticket submitted successfully!")
+            # Clear input fields after submission
+            st.text_area("Description")
+            st.session_state.selected_category = None
+            st.session_state.priority = None
 
 
 if __name__ == "__main__":
     main()
-
-
