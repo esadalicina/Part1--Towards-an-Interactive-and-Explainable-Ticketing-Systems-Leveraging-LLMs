@@ -7,11 +7,11 @@ from New_Ticket_Classification import predict_lr
 def get_ticket_solutions(category, df):
     if category:
         # Filter solutions based on category
-        filtered_df = df[df["Topic_category"] == category]
-        return filtered_df[["Topic_category", "Resolution", "complaint_what_happened"]].values.tolist()
+        filtered_df = df[df["Category"] == category]
+        return filtered_df[["Category", "Title", "Description"]].values.tolist()
     else:
         # Fetch random solutions
-        return df[["Topic_category", "Resolution", "complaint_what_happened"]].sample(n=5).values.tolist()  # Fetch 5 random solutions
+        return df[["Category", "Title", "Description"]].sample(n=5).values.tolist()  # Fetch 5 random solutions
 
 
 def main():
@@ -78,14 +78,19 @@ def main():
     # Retrieve ticket solutions from the dataset based on selected category and description
     solutions = get_ticket_solutions(category, df)
 
+    import base64
+
     if solutions:
-        for category, solution, complaint_what_happened in solutions:
-            if search_query.lower() in solution.lower() or search_query.lower() in complaint_what_happened.lower():
-                solution_partial = complaint_what_happened[:50] + "..." if len(solution) > 50 else solution
-                category_formatted = f"**{solution_partial}**"  # Format category name in bold
-                expander_title = f"{category_formatted}:"
+        for Category, Title, Description in solutions:
+            if search_query.lower() in Description.lower() or search_query.lower() in Title.lower() or search_query.lower() in Category.lower():
+                title_partial = f"**{Title[:50]}**..." if len(Title) > 50 else f"**{Title}**"
+                description_partial = Description[:100] + "..." if len(Description) > 100 else Description
+                expander_title = f"{title_partial}"
+                description_encoded = base64.b64encode(Description.encode()).decode()
+                full_description_link = f"<a href='data:text/html;base64,{description_encoded}' target='_blank'>View Full Description</a>"
                 with st.sidebar.expander(expander_title, expanded=False):
-                    st.write(solution)
+                    st.write(description_partial)
+                    st.markdown(full_description_link, unsafe_allow_html=True)
 
 
 if __name__ == "__main__":
