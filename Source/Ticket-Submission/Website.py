@@ -73,7 +73,6 @@ def main():
             st.session_state.selected_category = None
             st.session_state.description = ""
 
-
     # ------------------------------------------------ Solution suggestions --------------------------------------------
 
     # Solution suggestions
