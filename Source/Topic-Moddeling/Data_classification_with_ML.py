@@ -165,9 +165,9 @@ print(df_complaints)
 
 # ---------------------------------------------- 6. Save Model --------------------------------------------------
 
-# Save the model
-joblib.dump(model, '/Users/esada/Documents/UNI.lu/MICS/Master-Thesis/Model/xgb_model.pkl')
-
-# Saving the objects
-joblib.dump(count_vect, '/Users/esada/Documents/UNI.lu/MICS/Master-Thesis/Model/count_vect.pkl')
-joblib.dump(tfidf_transformer, '/Users/esada/Documents/UNI.lu/MICS/Master-Thesis/Model/tfidf_transformer.pkl')
+# # Save the model
+# joblib.dump(model, '/Users/esada/Documents/UNI.lu/MICS/Master-Thesis/Model/xgb_model.pkl')
+#
+# # Saving the objects
+# joblib.dump(count_vect, '/Users/esada/Documents/UNI.lu/MICS/Master-Thesis/Model/count_vect.pkl')
+# joblib.dump(tfidf_transformer, '/Users/esada/Documents/UNI.lu/MICS/Master-Thesis/Model/tfidf_transformer.pkl')

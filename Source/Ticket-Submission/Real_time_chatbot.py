@@ -2,27 +2,27 @@
 # https://www.consumerfinance.gov/consumer-tools/
 
 
-# --------------------- Supervised model to predict any new complaints to the relevant Topics --------------------------
-
+from sklearn.preprocessing import StandardScaler
 import pandas as pd
+import plotly.express as px
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
-from sklearn.model_selection import train_test_split, StratifiedKFold, GridSearchCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import MultinomialNB
 from xgboost import XGBClassifier
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, classification_report, confusion_matrix, ConfusionMatrixDisplay
-import plotly.express as px
+from sklearn.model_selection import StratifiedKFold, GridSearchCV, train_test_split
+from sklearn.metrics import roc_auc_score, accuracy_score, precision_score, recall_score, f1_score, classification_report
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 # Specify the file path of your CSV file
-file_path = '../../Dataset/Cleaned_Dataset.csv'
+file_path = '../../Dataset/clean.csv'
 
 # Read the CSV file into a DataFrame
 df_clean = pd.read_csv(file_path)
 
 # Keep the columns "complaint_what_happened" & "category" only in the new dataframe --> training_data
-training_data = df_clean[['complaint_what_happened', 'category']]
+training_data = df_clean[['complaint_what_happened', 'category_encoded']]
 
 # Display the first few rows of the DataFrame
 print(training_data.head())
@@ -37,11 +37,10 @@ tfidf_transformer = TfidfTransformer()
 X_train_tf = tfidf_transformer.fit_transform(X_train_counts)
 
 # Checking for class imbalance
-class_counts = training_data['category'].value_counts()
-px.bar(x=class_counts.index, y=class_counts.values / max(class_counts.values), title='Class Imbalance').show()
+px.bar(x=training_data['category_encoded'].value_counts().index, y=training_data['category_encoded'].value_counts().values/max(training_data['category_encoded'].value_counts().values), title='Class Imbalance')
 
 # Prepare the training and test data
-train_X, test_X, train_y, test_y = train_test_split(X_train_tf, training_data['category'], test_size=0.2, random_state=40)
+train_X, test_X, train_y, test_y = train_test_split(X_train_tf, training_data['category_encoded'], test_size=0.2, random_state=40)
 
 # Function to evaluate the model and display the results
 def eval_model(y_test, y_pred, y_pred_proba, type='Training'):
@@ -53,17 +52,18 @@ def eval_model(y_test, y_pred, y_pred_proba, type='Training'):
     print('ROC AUC Score: ', roc_auc_score(y_test, y_pred_proba, average='weighted', multi_class='ovr').round(2))
     print('Classification Report: ', classification_report(y_test, y_pred))
     cm = confusion_matrix(y_test, y_pred)
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=training_data['category'].unique())
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=training_data['category_encoded'].unique())
     disp.plot()
 
 # Function to grid search the best parameters for the model
-def run_model(model, param_grid):
-    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=40)
-    grid = GridSearchCV(model, param_grid=param_grid, cv=cv, scoring='f1_weighted', verbose=1, n_jobs=-1)
-    grid.fit(train_X, train_y)
+def run_model(model,param_grid):
+    cv=StratifiedKFold(n_splits=5,shuffle=True,random_state=40)
+    grid=GridSearchCV(model,param_grid={},cv=cv,scoring='f1_weighted',verbose=1,n_jobs=-1)
+    grid.fit(train_X,train_y)
     return grid.best_estimator_
 
 # 1. Logistic Regression
+# Running and evaluating the Logistic Regression model
 params = {
     'C': [0.001, 0.01, 0.1, 1, 10, 100],
     'penalty': ['l1', 'l2', 'elasticnet', 'none'],
@@ -108,8 +108,8 @@ params = {
     'fit_prior': [True, False]
 }
 model = run_model(MultinomialNB(), params)
-eval_model(train_y, model.predict(train_X), model.predict_log_proba(train_X).exp(), type='Training')
-eval_model(test_y, model.predict(test_X), model.predict_log_proba(test_X).exp(), type='Test')
+eval_model(train_y, model.predict(train_X), np.exp(model.predict_log_proba(train_X)), type='Training')
+eval_model(test_y, model.predict(test_X), np.exp(model.predict_log_proba(test_X)), type='Test')
 
 # 5. XGBoost Classifier
 params = {
@@ -125,28 +125,25 @@ model = run_model(XGBClassifier(use_label_encoder=False), params)
 eval_model(train_y, model.predict(train_X), model.predict_proba(train_X), type='Training')
 eval_model(test_y, model.predict(test_X), model.predict_proba(test_X), type='Test')
 
-
 # --------------------------------------------------- Conclusion -------------------------------------------------------
 
-# Applying the best model on the Custom Text
-# We will use the XGBoost model as it has the best performance
-df_complaints = pd.DataFrame({'complaints': ["I can not get from chase who services my mortgage, who owns it and who has original loan docs",
-                                  "The bill amount of my credit card was debited twice. Please look into the matter and resolve at the earliest.",
-                                  "I want to open a salary account at your downtown branch. Please provide me the procedure.",
-                                  "Yesterday, I received a fraudulent email regarding renewal of my services.",
-                                  "What is the procedure to know my CIBIL score?",
-                                  "I need to know the number of bank branches and their locations in the city of Dubai"]})
-
-
-# def predict_lr(text):
-#     Topic_names = {0:'Account Services', 1:'Others', 2:'Mortgage/Loan', 3:'Credit card or prepaid card', 4:'Theft/Dispute Reporting'}
-#     X_new_counts = count_vect.transform(text)
-#     X_new_tfidf = tfidf_transformer.transform(X_new_counts)
-#     predicted = model.predict(X_new_tfidf)
-#     return Topic_names[predicted[0]]
+# # Applying the best model on the Custom Text
+# # We will use the XGBoost model as it has the best performance
+# df_complaints = pd.DataFrame({'complaints': [
+#     "I can not get from chase who services my mortgage, who owns it and who has original loan docs",
+#     "The bill amount of my credit card was debited twice. Please look into the matter and resolve at the earliest.",
+#     "I want to open a salary account at your downtown branch. Please provide me the procedure.",
+#     "Yesterday, I received a fraudulent email regarding renewal of my services.",
+#     "What is the procedure to know my CIBIL score?",
+#     "I need to know the number of bank branches and their locations in the city of Dubai"
+# ]})
 #
+# # Vectorize and transform the custom text data
+# custom_counts = count_vect.transform(df_complaints['complaints'])
+# custom_tf = tfidf_transformer.transform(custom_counts)
+# custom_tf_scaled = scaler.transform(custom_tf)
 #
-# df_complaints['tag'] = df_complaints['complaints'].apply(lambda x: predict_lr([x]))
-# print(df_complaints)
-
+# # Predict the categories using the best model (XGBoost)
+# predicted_categories = model.predict(custom_tf_scaled)
+# print(predicted_categories)
 
