@@ -12,6 +12,8 @@ from tqdm import tqdm
 from wordcloud import WordCloud
 import spacy
 
+
+
 tqdm.pandas()
 warnings.filterwarnings('ignore')
 
@@ -157,6 +159,7 @@ plt.show()
 
 # Removing -PRON- from the text corpus
 df_clean['Complaint_clean'] = df_clean['complaint_POS_removed'].str.replace('-PRON-', '')
+df_clean['Complaint_clean'] = df_clean['Complaint_clean'].str.replace('xxxx', '')
 
 
 # function to get the specified top n-grams
@@ -187,7 +190,6 @@ for word, freq in trigram:
     print(word, freq)
 px.bar(x=[word for word, freq in trigram], y=[freq for word, freq in trigram], title='Top 10 Trigram')
 
-df_clean['Complaint_clean'] = df_clean['Complaint_clean'].str.replace('xxxx', '')
 
 # All masked texts has been removed
 print(tabulate(df_clean.head(), headers='keys', tablefmt='pretty'))
