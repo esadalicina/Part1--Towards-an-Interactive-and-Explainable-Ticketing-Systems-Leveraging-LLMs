@@ -7,7 +7,7 @@ from tabulate import tabulate
 new_dataset = pd.DataFrame(columns=["Category", "Title", "Description"])
 
 
-# ----------------------------------- Add solution examples to the new dataset ----------------------------------------
+# ----------------------------- Add knowledgebase examples to the new dataset ------------------------------------------
 
 new_dataset['Category'] = ["Bank Account or Service", "Bank Account or Service", "Bank Account or Service", "Bank Account or Service", "Bank Account or Service",
                            "Credit Cards and Prepaid Cards", "Credit Cards and Prepaid Cards", "Credit Cards and Prepaid Cards", "Credit Cards and Prepaid Cards", "Credit Cards and Prepaid Cards",
@@ -49,6 +49,6 @@ new_dataset["Description"] = ["Online banking enables account holders to access 
 
 
 # Save the new dataset to a new CSV file
-new_dataset.to_csv('../../Dataset/KB_dataset.csv', index=False)
-print(tabulate(new_dataset.head(), headers='keys', tablefmt='pretty'))
+# new_dataset.to_csv('../../Dataset/KB_dataset.csv', index=False)
+# print(tabulate(new_dataset.head(), headers='keys', tablefmt='pretty'))
 

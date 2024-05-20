@@ -58,7 +58,7 @@ def eval_model(y_test,y_pred,y_pred_proba,type='Training'):
 # Function to grid search the best parameters for the model
 def run_model(model,param_grid):
     cv=StratifiedKFold(n_splits=5,shuffle=True,random_state=40)
-    grid=GridSearchCV(model,param_grid={},cv=cv,scoring='f1_weighted',verbose=1,n_jobs=-1)
+    grid=GridSearchCV(model,param_grid=param_grid,cv=cv,scoring='f1_weighted',verbose=1,n_jobs=-1)
     grid.fit(train_X,train_y)
     return grid.best_estimator_
 

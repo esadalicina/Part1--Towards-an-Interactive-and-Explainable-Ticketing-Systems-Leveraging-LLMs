@@ -1,8 +1,9 @@
 from imblearn.over_sampling import SMOTE
-from sklearn.preprocessing import StandardScaler
 import pandas as pd
 import numpy as np
 import plotly.express as px
+import plotly.io as pio
+from sklearn.svm import SVC
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
@@ -19,7 +20,7 @@ file_path = '../../Dataset/Cleaned_Dataset.csv'
 # Read the CSV file into a DataFrame
 df_clean = pd.read_csv(file_path)
 
-# Keep the columns "complaint_what_happened" & "category" only in the new dataframe --> training_data
+# Keep the columns "complaint_what_happened" & "category_encoded" only in the new dataframe --> training_data
 training_data = df_clean[['complaint_what_happened', 'category_encoded']]
 
 # Display the first few rows of the DataFrame
@@ -35,8 +36,7 @@ tfidf_transformer = TfidfTransformer()
 X_train_tf = tfidf_transformer.fit_transform(X_train_counts)
 
 # Checking for class imbalance
-class_counts = training_data['category_encoded'].value_counts()
-px.bar(x=class_counts.index, y=class_counts.values / max(class_counts.values), title='Class Imbalance').show()
+px.bar(x=training_data['category_encoded'].value_counts().index, y=training_data['category_encoded'].value_counts().values/max(training_data['category_encoded'].value_counts().values), title='Class Imbalance')
 
 # Handle class imbalance using SMOTE
 smote = SMOTE(random_state=42)
@@ -61,15 +61,14 @@ def eval_model(y_test, y_pred, y_pred_proba, type='Training'):
 
 
 # Function to grid search the best parameters for the model
-def run_model(model,param_grid):
-    cv=StratifiedKFold(n_splits=5,shuffle=True,random_state=40)
-    grid=GridSearchCV(model,param_grid={},cv=cv,scoring='f1_weighted',verbose=1,n_jobs=-1)
-    grid.fit(train_X,train_y)
+def run_model(model, param_grid):
+    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=40)
+    grid = GridSearchCV(model, param_grid=param_grid, cv=cv, scoring='f1_weighted', verbose=1, n_jobs=-1)
+    grid.fit(train_X, train_y)
     return grid.best_estimator_
 
 
-# 1. Logistic Regression
-# Running and evaluating the Logistic Regression model
+print("------------------------------------------# 1. Logistic Regression #-------------------------------------------")
 params = {
     'C': [0.001, 0.01, 0.1, 1, 10, 100],
     'penalty': ['l1', 'l2', 'elasticnet', 'none'],
@@ -77,11 +76,12 @@ params = {
     'max_iter': [100, 200, 300, 500, 1000],
     'class_weight': [None, 'balanced']
 }
-model = run_model(LogisticRegression(), params)
-eval_model(train_y, model.predict(train_X), model.predict_proba(train_X), type='Training')
-eval_model(test_y, model.predict(test_X), model.predict_proba(test_X), type='Test')
+model1 = run_model(LogisticRegression(), params)
+eval_model(train_y, model1.predict(train_X), model1.predict_proba(train_X), type='Training')
+eval_model(test_y, model1.predict(test_X), model1.predict_proba(test_X), type='Test')
 
-# 2. Decision Tree
+
+print("-----------------------------------------------# 2. Decision Tree #--------------------------------------------")
 params = {
     'criterion': ['gini', 'entropy'],
     'splitter': ['best', 'random'],
@@ -90,11 +90,12 @@ params = {
     'min_samples_leaf': [1, 2, 4, 6, 8, 10],
     'max_features': [None, 'auto', 'sqrt', 'log2']
 }
-model = run_model(DecisionTreeClassifier(), params)
-eval_model(train_y, model.predict(train_X), model.predict_proba(train_X), type='Training')
-eval_model(test_y, model.predict(test_X), model.predict_proba(test_X), type='Test')
+model2 = run_model(DecisionTreeClassifier(), params)
+eval_model(train_y, model2.predict(train_X), model2.predict_proba(train_X), type='Training')
+eval_model(test_y, model2.predict(test_X), model2.predict_proba(test_X), type='Test')
 
-# 3. Random Forest
+
+print("---------------------------------------------# 3. Random Forest #--------------------------------------------")
 params = {
     'n_estimators': [10, 50, 100, 200, 500],
     'criterion': ['gini', 'entropy'],
@@ -104,20 +105,22 @@ params = {
     'max_features': [None, 'auto', 'sqrt', 'log2'],
     'bootstrap': [True, False]
 }
-model = run_model(RandomForestClassifier(), params)
-eval_model(train_y, model.predict(train_X), model.predict_proba(train_X), type='Training')
-eval_model(test_y, model.predict(test_X), model.predict_proba(test_X), type='Test')
+model3 = run_model(RandomForestClassifier(), params)
+eval_model(train_y, model3.predict(train_X), model3.predict_proba(train_X), type='Training')
+eval_model(test_y, model3.predict(test_X), model3.predict_proba(test_X), type='Test')
 
-# 4. Multinomial Naive Bayes
+
+print("-----------------------------------------------# 4. Naive Bayes #----------------------------------------------")
 params = {
     'alpha': [0.1, 0.5, 1, 2, 5],
     'fit_prior': [True, False]
 }
-model = run_model(MultinomialNB(), params)
-eval_model(train_y, model.predict(train_X), np.exp(model.predict_log_proba(train_X)), type='Training')
-eval_model(test_y, model.predict(test_X), np.exp(model.predict_log_proba(test_X)), type='Test')
+model4 = run_model(MultinomialNB(), params)
+eval_model(train_y, model4.predict(train_X), np.exp(model4.predict_log_proba(train_X)), type='Training')
+eval_model(test_y, model4.predict(test_X), np.exp(model4.predict_log_proba(test_X)), type='Test')
 
-# 5. XGBoost Classifier
+
+print("-------------------------------------------------# 5. XGBoost #------------------------------------------------")
 params = {
     'n_estimators': [100, 200, 500],
     'max_depth': [3, 5, 7],
@@ -127,11 +130,25 @@ params = {
     'subsample': [0.5, 0.8, 1],
     'colsample_bytree': [0.5, 0.8, 1]
 }
-model = run_model(XGBClassifier(use_label_encoder=False), params)
-eval_model(train_y, model.predict(train_X), model.predict_proba(train_X), type='Training')
-eval_model(test_y, model.predict(test_X), model.predict_proba(test_X), type='Test')
+model5 = run_model(XGBClassifier(use_label_encoder=False), params)
+eval_model(train_y, model5.predict(train_X), model5.predict_proba(train_X), type='Training')
+eval_model(test_y, model5.predict(test_X), model5.predict_proba(test_X), type='Test')
 
-# --------------------------------------------------- Conclusion -------------------------------------------------------
+
+print("----------------------------------------------------# 6. SVM #-------------------------------------------------")
+params = {
+    'C': [0.1, 1, 10, 100],
+    'kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
+    'degree': [2, 3, 4],
+    'gamma': ['scale', 'auto'],
+    'class_weight': [None, 'balanced']
+}
+model6 = run_model(SVC(probability=True), params)
+eval_model(train_y, model6.predict(train_X), model6.predict_proba(train_X), type='Training')
+eval_model(test_y, model6.predict(test_X), model6.predict_proba(test_X), type='Test')
+
+
+print("-------------------------------------------------# Conclusion #------------------------------------------------")
 
 # Applying the best model on the Custom Text
 # We will use the XGBoost model as it has the best performance
@@ -144,12 +161,13 @@ df_complaints = pd.DataFrame({'complaints': [
     "I need to know the number of bank branches and their locations in the city of Dubai"
 ]})
 
+
 def predict_lr(text):
     Topic_names = {0: 'Credit Reporting and Debt Collection', 1: 'Credit Cards and Prepaid Cards',
                    2: 'Bank Account or Service', 3: 'Loans', 4: 'Money Transfers and Financial Services'}
     X_new_counts = count_vect.transform(text)
     X_new_tfidf = tfidf_transformer.transform(X_new_counts)
-    predicted = model.predict(X_new_tfidf)
+    predicted = model5.predict(X_new_tfidf)
     return Topic_names[predicted[0]]
 
 
@@ -157,7 +175,7 @@ df_complaints['tag'] = df_complaints['complaints'].apply(lambda x: predict_lr([x
 print(df_complaints)
 
 
-# ---------------------------------------------- 6. Save Model --------------------------------------------------
+# ---------------------------------------------------- Save Model ------------------------------------------------------
 
 # # Save the model
 # joblib.dump(model, '/Users/esada/Documents/UNI.lu/MICS/Master-Thesis/Model/xgb_model.pkl')
