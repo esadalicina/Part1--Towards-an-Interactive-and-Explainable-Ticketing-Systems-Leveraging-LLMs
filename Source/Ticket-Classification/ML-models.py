@@ -14,7 +14,7 @@ from sklearn.metrics import roc_auc_score, accuracy_score, precision_score, reca
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 # Specify the file path of your CSV file
-file_path = '../../Dataset/clean.csv'
+file_path = '../../Dataset/Cleaned_dataset.csv'
 
 # Read the CSV file into a DataFrame
 df_clean = pd.read_csv(file_path)
@@ -42,11 +42,7 @@ px.bar(x=class_counts.index, y=class_counts.values / max(class_counts.values), t
 smote = SMOTE(random_state=42)
 X_res, y_res = smote.fit_resample(X_train_tf, training_data['category_encoded'])
 
-# Checking for class imbalance
-# px.bar(x=training_data['category_encoded'].value_counts().index, y=training_data['category_encoded'].value_counts().values/max(training_data['category_encoded'].value_counts().values), title='Class Imbalance')
-
 # Prepare the training and test data
-# train_X, test_X, train_y, test_y = train_test_split(X_train_tf, training_data['category_encoded'], test_size=0.2, random_state=40)
 train_X, test_X, train_y, test_y = train_test_split(X_res, y_res, test_size=0.2, random_state=40)
 
 
@@ -63,12 +59,14 @@ def eval_model(y_test, y_pred, y_pred_proba, type='Training'):
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=training_data['category_encoded'].unique())
     disp.plot()
 
+
 # Function to grid search the best parameters for the model
 def run_model(model,param_grid):
     cv=StratifiedKFold(n_splits=5,shuffle=True,random_state=40)
     grid=GridSearchCV(model,param_grid={},cv=cv,scoring='f1_weighted',verbose=1,n_jobs=-1)
     grid.fit(train_X,train_y)
     return grid.best_estimator_
+
 
 # 1. Logistic Regression
 # Running and evaluating the Logistic Regression model
@@ -147,8 +145,8 @@ df_complaints = pd.DataFrame({'complaints': [
 ]})
 
 def predict_lr(text):
-    Topic_names = {0: 'Credit Reporting and Debt Collection', 1: 'Credit Cards and Prepaid Cards', 2: 'Bank Account or Service',
-     3: 'Loans', 4: 'Money Transfers and Financial Services'}
+    Topic_names = {0: 'Credit Reporting and Debt Collection', 1: 'Credit Cards and Prepaid Cards',
+                   2: 'Bank Account or Service', 3: 'Loans', 4: 'Money Transfers and Financial Services'}
     X_new_counts = count_vect.transform(text)
     X_new_tfidf = tfidf_transformer.transform(X_new_counts)
     predicted = model.predict(X_new_tfidf)
