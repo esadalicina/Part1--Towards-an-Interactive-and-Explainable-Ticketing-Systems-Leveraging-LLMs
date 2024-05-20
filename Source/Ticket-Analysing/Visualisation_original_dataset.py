@@ -176,12 +176,17 @@ df['category_encoded'] = pd.factorize(df['category'])[0]
 
 print(df)
 
+# Create a dictionary to map encoded categories to original category names
+category_mapping = dict(zip(df['category_encoded'], df['category']))
+
+print("\nMapping of Encoded Categories to Original Category Names:")
+print(category_mapping)
 
 # Specify the file path where you want to save the modified DataFrame as a CSV file
-output_file = '../../Dataset/clean.csv'
+# output_file = '../../Dataset/clean.csv'
 
 # Save the modified DataFrame to a CSV file
-df.to_csv(output_file, index=False)
+# df.to_csv(output_file, index=False)
 
 
 

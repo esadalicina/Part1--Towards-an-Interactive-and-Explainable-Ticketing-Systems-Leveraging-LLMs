@@ -4,7 +4,6 @@ from New_Ticket_Classification import predict_lr
 import time
 
 
-
 # Function to retrieve ticket solutions from the dataset
 def get_ticket_solutions(category, df):
     if category:
@@ -15,12 +14,13 @@ def get_ticket_solutions(category, df):
         # Fetch random solutions
         return df[["Category", "Title", "Description"]].sample(n=5).values.tolist()  # Fetch 5 random solutions
 
+
 def main():
 
     # Ticket submission form
     st.header("Ticket Submission")
 
-    df = pd.read_csv("/Users/esada/Documents/UNI.lu/MICS/Master-Thesis/Dataset/new_dataset.csv")
+    df = pd.read_csv("/Users/esada/Documents/UNI.lu/MICS/Master-Thesis/Dataset/KB_dataset.csv")
 
     # Define category descriptions
     category_descriptions = {
