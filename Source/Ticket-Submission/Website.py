@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 from New_Ticket_Classification import predict_lr
-import time
 
 
 # Function to retrieve ticket solutions from the dataset
