@@ -14,7 +14,7 @@ from sklearn.metrics import roc_auc_score, accuracy_score, precision_score, reca
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 # Specify the file path of your CSV file
-file_path = '../../Dataset/Cleaned_dataset.csv'
+file_path = '../../Dataset/Cleaned_Dataset.csv'
 
 # Read the CSV file into a DataFrame
 df_clean = pd.read_csv(file_path)
