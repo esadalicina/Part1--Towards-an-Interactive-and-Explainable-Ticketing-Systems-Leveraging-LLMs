@@ -9,15 +9,15 @@ new_dataset = pd.DataFrame(columns=["Category", "Title", "Description"])
 
 # ----------------------------------- Add solution examples to the new dataset ----------------------------------------
 
-new_dataset['Category'] = ["Bank Account Services", "Bank Account Services", "Bank Account Services", "Bank Account Services", "Bank Account Services",
-                           "Credit Card or Prepaid Card", "Credit Card or Prepaid Card", "Credit Card or Prepaid Card", "Credit Card or Prepaid Card", "Credit Card or Prepaid Card",
-                            "Others", "Others", "Others", "Others", "Others",
-                           "Theft/Dispute Reporting", "Theft/Dispute Reporting", "Theft/Dispute Reporting", "Theft/Dispute Reporting", "Theft/Dispute Reporting",
-                           "Mortgage/Loan", "Mortgage/Loan", "Mortgage/Loan", "Mortgage/Loan", "Mortgage/Loan"]
+new_dataset['Category'] = ["Bank Account or Service", "Bank Account or Service", "Bank Account or Service", "Bank Account or Service", "Bank Account or Service",
+                           "Credit Cards and Prepaid Cards", "Credit Cards and Prepaid Cards", "Credit Cards and Prepaid Cards", "Credit Cards and Prepaid Cards", "Credit Cards and Prepaid Cards",
+                            "Money Transfers and Financial Services", "Money Transfers and Financial Services", "Money Transfers and Financial Services", "Money Transfers and Financial Services", "Money Transfers and Financial Services",
+                           "Credit Reporting and Debt Collection", "Credit Reporting and Debt Collection", "Credit Reporting and Debt Collection", "Credit Reporting and Debt Collection", "Credit Reporting and Debt Collection",
+                           "Loans", "Loans", "Loans", "Loans", "Loans"]
 
 new_dataset["Title"] = ["Online Banking", "Direct Deposit", "ATM Services", "Overdraft Protection", "Wire Transfers",
                         "Rewards Credit Card", "Secured Credit Card", "Prepaid Debit Card", "Travel Credit Card", "Student Credit Card",
-                        "Investment Accounts", "Retirement Accounts", "Insurance Services", "Financial Planning Services", "Estate Planning Services",
+                        "World Bank", "SWIFT", "Insurance Services", "Financial Planning Services", "Estate Planning Services",
                         "Unauthorized Transactions", "Identity Theft", "Fraudulent Charges", "Disputed Transactions", "Lost or Stolen Cards",
                         "Home Mortgage", "Auto Loan", "Personal Loan", "Student Loan", "Business Loan"]
 
@@ -31,8 +31,8 @@ new_dataset["Description"] = ["Online banking enables account holders to access 
                               "Prepaid debit cards allow users to load funds onto the card and use it for purchases, similar to a debit card, but without being linked to a bank account. They are convenient for budgeting, travel, and online shopping, offering spending control and security without the risk of overdraft fees.",
                               "Travel credit cards cater to frequent travelers and offer benefits such as travel insurance, airport lounge access, no foreign transaction fees, and bonus rewards for travel-related expenses. They provide valuable perks and rewards for individuals who frequently fly, stay in hotels, or dine out while traveling.",
                               "Student credit cards are tailored for college students with limited credit history and typically offer low credit limits, educational resources, and rewards or benefits geared towards students' needs and lifestyles. They help students build credit responsibly while managing their finances independently.",
-                              "Investment accounts allow individuals to buy, sell, and hold investments such as stocks, bonds, mutual funds, and exchange-traded funds (ETFs). They provide opportunities for wealth accumulation, retirement savings, and portfolio diversification, helping investors achieve their financial goals.",
-                              "Retirement accounts, such as 401(k)s, Individual Retirement Accounts (IRAs), and pensions, are designed to save and invest funds for retirement. They offer tax advantages, employer contributions (in the case of employer-sponsored plans), and various investment options to help individuals build a retirement nest egg.",
+                              "The World Bank provides extensive information and data on remittances, which are funds transferred by migrants to their home countries. This knowledge base covers the economic impact of remittances, policies to improve the efficiency and reduce the cost of money transfers, and strategies to enhance financial inclusion. The resources include reports, research papers, and policy recommendations aimed at leveraging remittances for development.",
+                              "SWIFT (Society for Worldwide Interbank Financial Telecommunication) offers a vast Knowledge Center focused on secure financial messaging services used by financial institutions worldwide. It covers topics such as cross-border payments, compliance and regulatory issues, cybersecurity in financial transactions, and innovations in financial technology. The Knowledge Center includes articles, whitepapers, case studies, and webinars to help professionals stay informed about the latest developments in the industry.",
                               "Insurance services encompass various types of insurance coverage, including life insurance, health insurance, auto insurance, home insurance, and disability insurance. Insurance protects individuals and businesses against financial losses from unexpected events, such as accidents, illnesses, natural disasters, or death, providing financial security and peace of mind.",
                               "Financial planning services provide professional assistance with budgeting, investing, retirement planning, tax planning, estate planning, and other aspects of personal finance. Certified financial planners (CFPs) help individuals and families set financial goals, create customized financial plans, and make informed decisions to achieve financial success and security.",
                               "Estate planning services involve creating wills, trusts, powers of attorney, healthcare directives, and other legal documents to manage and distribute assets after death. Estate planning ensures that individuals' wishes are followed, minimizes estate taxes, avoids probate, and provides for the financial well-being of heirs and beneficiaries. It involves careful consideration of family dynamics, asset protection, and charitable giving strategies.",
@@ -50,8 +50,5 @@ new_dataset["Description"] = ["Online banking enables account holders to access 
 
 # Save the new dataset to a new CSV file
 new_dataset.to_csv('../../Dataset/KB_dataset.csv', index=False)
-
 print(tabulate(new_dataset.head(), headers='keys', tablefmt='pretty'))
-
-
 
