@@ -71,11 +71,13 @@ def run_model(model, param_grid):
 print("------------------------------------------# 1. Logistic Regression #-------------------------------------------")
 params = {
     'C': [0.001, 0.01, 0.1, 1, 10, 100],
-    'penalty': ['l1', 'l2', 'elasticnet', 'none'],
+    'penalty': ['l1', 'l2', 'elasticnet', 'None'],
     'solver': ['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga'],
     'max_iter': [100, 200, 300, 500, 1000],
     'class_weight': [None, 'balanced']
 }
+
+
 model1 = run_model(LogisticRegression(), params)
 eval_model(train_y, model1.predict(train_X), model1.predict_proba(train_X), type='Training')
 eval_model(test_y, model1.predict(test_X), model1.predict_proba(test_X), type='Test')
