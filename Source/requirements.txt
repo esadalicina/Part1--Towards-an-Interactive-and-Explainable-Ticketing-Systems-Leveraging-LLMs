@@ -1,0 +1,16 @@
+imbalanced-learn
+pandas
+numpy
+plotly
+matplotlib
+scikit-learn
+seaborn
+xgboost
+re
+warnings
+tqdm
+spacy
+json
+tabulate
+joblib
+streamlit
