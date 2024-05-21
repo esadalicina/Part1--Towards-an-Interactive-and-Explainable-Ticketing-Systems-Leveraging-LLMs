@@ -205,3 +205,4 @@ def run_model(model, param_grid):
 # # Saving the objects
 # joblib.dump(count_vect, '/Users/esada/Documents/UNI.lu/MICS/Master-Thesis/Model/count_vect.pkl')
 # joblib.dump(tfidf_transformer, '/Users/esada/Documents/UNI.lu/MICS/Master-Thesis/Model/tfidf_transformer.pkl')
+
