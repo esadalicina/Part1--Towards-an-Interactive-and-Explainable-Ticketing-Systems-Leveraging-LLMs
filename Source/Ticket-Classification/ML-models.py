@@ -89,29 +89,6 @@ def run_model(model, param_grid):
     return grid.best_estimator_
 
 
-# Function to display training and validation loss and accuracy
-def display_training_loss_and_accuracy(model, train_X, train_y, test_X, test_y):
-    train_acc = []
-    test_acc = []
-
-    for i in range(5):  # Assuming 5-fold cross-validation
-        model.fit(train_X, train_y)
-        train_pred = model.predict(train_X)
-        test_pred = model.predict(test_X)
-
-        train_acc.append(accuracy_score(train_y, train_pred))
-        test_acc.append(accuracy_score(test_y, test_pred))
-
-    plt.figure(figsize=(10, 5))
-    plt.plot(range(1, 6), train_acc, label='Training Accuracy')
-    plt.plot(range(1, 6), test_acc, label='Validation Accuracy')
-    plt.xlabel('Fold')
-    plt.ylabel('Accuracy')
-    plt.title('Training and Validation Accuracy per Fold')
-    plt.legend()
-    plt.show()
-
-
 # print("------------------------------------------# 1. Logistic Regression #-------------------------------------------")
 # params = {
 #     'C': [0.001, 0.01, 0.1, 1, 10, 100],
@@ -124,9 +101,7 @@ def display_training_loss_and_accuracy(model, train_X, train_y, test_X, test_y):
 # model1 = run_model(LogisticRegression(), params)
 # eval_model(train_y, model1.predict(train_X), model1.predict_proba(train_X), type='Training')
 # eval_model(test_y, model1.predict(test_X), model1.predict_proba(test_X), type='Test')
-#
-# # Display Training History
-# display_training_loss_and_accuracy(model1, train_X, train_y, test_X, test_y)
+
 
 
 # print("-----------------------------------------------# 2. Decision Tree #--------------------------------------------")
