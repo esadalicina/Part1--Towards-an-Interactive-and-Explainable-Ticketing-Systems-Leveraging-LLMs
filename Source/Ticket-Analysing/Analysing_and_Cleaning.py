@@ -60,14 +60,14 @@ print("------------------------------ Unique Value Counts ----------------------
 unique_value_counts = df.nunique()
 print(unique_value_counts)
 
-# Print unique values of specific columns
+# Print unique values of specific columns to see if they can be used for labels for the classification part
 print(f"Unique values of column 'tags': {df['tags'].unique()}")
 print(f"Unique values of column 'product': {df['product'].unique()}")
 
-# Drop the 'tags' column as it's no longer needed
+# Drop the 'tags' column as it's no longer needed, the values have no real meaning/connestion to the dataset
 df = df.drop(columns=["tags"])
 
-# Remove rows where 'complaint_what_happened' is NaN
+# Remove rows where 'complaint_what_happened' is NaN, because its our main column and main focus, we dont need empty complaints
 df = df.dropna(subset=['complaint_what_happened'])
 
 # Remove duplicate entries based on 'complaint_what_happened'
@@ -77,7 +77,9 @@ df = df.drop_duplicates(subset=['complaint_what_happened'])
 print("------------------------------ Dataset Information After Further Cleaning ------------------------------")
 print(df.info())
 
-# Drop columns 'sub_issue' and 'issue' as they are no longer needed
+# Drop columns 'sub_issue' and 'issue' as they are no longer needed, they can not be used for any classification part or further use
+# They have to many unique values and its just a small description of the complaint.
+# In further steps we will use an LLM to create a summary of the ticket 
 df = df.drop(columns=["sub_issue", "issue"])
 
 # Display information about the dataframe after dropping additional columns
@@ -97,7 +99,7 @@ unique_subproduct_counts.columns = ['product', 'Unique Sub-Product Count']
 print("------------------------------ Unique Sub-Product Counts ------------------------------")
 print(unique_subproduct_counts)
 
-# Group by 'product' and count unique 'complaint_what_happened' values
+# Group by 'product' and count unique 'complaint_what_happened' values to see if its balanced between the products
 unique_complaints_counts = df.groupby('product')['complaint_what_happened'].nunique().reset_index()
 unique_complaints_counts.columns = ['product', 'Unique Complaints Count']
 print("------------------------------ Unique Complaints Counts ------------------------------")
@@ -105,7 +107,7 @@ print(unique_complaints_counts)
 
 # ---------------------------------------------- Category Mapping ----------------------------------------------
 
-# Define categories and their subcategories
+# Define manualy categories with the corresponding products
 categories = {
     "Bank Account or Service": ["Checking or savings account", "Bank account or service"],
     "Loans": ["Consumer Loan", "Mortgage", "Payday loan", "Payday loan, title loan, or personal loan", "Student loan", "Vehicle loan or lease"],
@@ -130,13 +132,13 @@ df = df.drop(columns=["sub_product"])
 print("------------------------------ Dataset Information After Category Mapping ------------------------------")
 print(df.info())
 
-# Group by 'category' and count unique 'complaint_what_happened' values
+# Group by 'category' and count unique 'complaint_what_happened' values, to see if the data is balanced
 unique_category_counts = df.groupby('category')['complaint_what_happened'].nunique().reset_index()
 unique_category_counts.columns = ['category', 'Unique Complaint Count']
 print("------------------------------ Unique Complaint Counts by Category ------------------------------")
 print(unique_category_counts)
 
-# Encode categories using pandas' factorize method
+# Encode categories using pandas' factorize method, for further classification
 df['category_encoded'] = pd.factorize(df['category'])[0]
 
 print("------------------------------ Final DataFrame with Encoded Categories ------------------------------")
