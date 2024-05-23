@@ -6,7 +6,7 @@ from tabulate import tabulate
 # ---------------------------------------------- Load the Data ----------------------------------------------
 
 # Opening JSON file and loading the data into a dictionary
-with open('../../Dataset/complaints-2021-05-14_08_16.json') as f:
+with open('/home/users/elicina/Master-Thesis/Dataset/complaints-2021-05-14_08_16.json') as f:
     data = json.load(f)
 
 # Normalize JSON data into a flat table
