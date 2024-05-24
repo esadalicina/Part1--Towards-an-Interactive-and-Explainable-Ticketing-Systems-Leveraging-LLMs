@@ -21,11 +21,3 @@ from Tokenization import *
 
 
 
-
-
-# Prepare the training and test data
-#train_X, test_X, train_y, test_y = train_test_split(X_res, y_res, test_size=0.2, random_state=40)
-
-
-
-
