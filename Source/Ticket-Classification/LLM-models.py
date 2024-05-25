@@ -1,181 +1,91 @@
-import pandas as pd
+from sklearn.base import accuracy_score
+from sklearn.metrics import classification_report
+from sklearn.model_selection import train_test_split
+from transformers import RobertaTokenizer, RobertaForSequenceClassification, BertTokenizer, BertForSequenceClassification
+from torch.utils.data import DataLoader, TensorDataset
 import torch
-import numpy as np
-from transformers import BertTokenizer, BertModel
-from torch import nn
-from torch.optim import Adam
-from tqdm import tqdm
 
+# Load RoBERTa tokenizer and model
+roberta_tokenizer = RobertaTokenizer.from_pretrained('roberta-base')
+roberta_model = RobertaForSequenceClassification.from_pretrained('roberta-base')
 
-# Specify the file path of your CSV file
-file_path = '../../Dataset/Cleaned_Dataset.csv'
+# Load BERT tokenizer and model
+bert_tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+bert_model = BertForSequenceClassification.from_pretrained('bert-base-uncased')
 
-# Read the CSV file into a DataFrame
-df = pd.read_csv(file_path)
-df.head()
+# Tokenize and encode text data
+def tokenize_data(tokenizer, texts, max_length):
+    input_ids = []
+    attention_masks = []
+    for text in texts:
+        encoded_dict = tokenizer.encode_plus(
+                            text,                      
+                            add_special_tokens = True, 
+                            max_length = max_length,           
+                            pad_to_max_length = True,
+                            return_attention_mask = True,   
+                            return_tensors = 'pt',     
+                       )
+        input_ids.append(encoded_dict['input_ids'])
+        attention_masks.append(encoded_dict['attention_mask'])
+    input_ids = torch.cat(input_ids, dim=0)
+    attention_masks = torch.cat(attention_masks, dim=0)
+    return input_ids, attention_masks
 
-df.groupby(['category']).size().plot.bar()
+# Train and evaluate RoBERTa and BERT models
+def train_and_evaluate_model(model, tokenizer, train_texts, train_labels, test_texts, test_labels):
+    # Tokenize and encode training data
+    train_input_ids, train_attention_masks = tokenize_data(tokenizer, train_texts, max_length=128)
+    train_labels_tensor = torch.tensor(train_labels)
 
-tokenizer = BertTokenizer.from_pretrained('bert-base-cased')
-labels = {'business':0,
-          'entertainment':1,
-          'sport':2,
-          'tech':3,
-          'politics':4
-          }
+    # Tokenize and encode test data
+    test_input_ids, test_attention_masks = tokenize_data(tokenizer, test_texts, max_length=128)
+    test_labels_tensor = torch.tensor(test_labels)
 
-class Dataset(torch.utils.data.Dataset):
+    # Create DataLoader for training and testing data
+    train_data = TensorDataset(train_input_ids, train_attention_masks, train_labels_tensor)
+    train_dataloader = DataLoader(train_data, batch_size=32, shuffle=True)
 
-    def __init__(self, df):
+    test_data = TensorDataset(test_input_ids, test_attention_masks, test_labels_tensor)
+    test_dataloader = DataLoader(test_data, batch_size=32, shuffle=False)
 
-        self.labels = [labels[label] for label in df['category']]
-        self.texts = [tokenizer(text,
-                               padding='max_length', max_length = 512, truncation=True,
-                                return_tensors="pt") for text in df['text']]
+    # Define optimizer and loss function
+    optimizer = torch.optim.AdamW(model.parameters(), lr=2e-5)
+    loss_fn = torch.nn.CrossEntropyLoss()
 
-    def classes(self):
-        return self.labels
-
-    def __len__(self):
-        return len(self.labels)
-
-    def get_batch_labels(self, idx):
-        # Fetch a batch of labels
-        return np.array(self.labels[idx])
-
-    def get_batch_texts(self, idx):
-        # Fetch a batch of inputs
-        return self.texts[idx]
-
-    def __getitem__(self, idx):
-
-        batch_texts = self.get_batch_texts(idx)
-        batch_y = self.get_batch_labels(idx)
-
-        return batch_texts, batch_y
-
-
-
-class BertClassifier(nn.Module):
-
-    def __init__(self, dropout=0.5):
-
-        super(BertClassifier, self).__init__()
-
-        self.bert = BertModel.from_pretrained('bert-base-cased')
-        self.dropout = nn.Dropout(dropout)
-        self.linear = nn.Linear(768, 5)
-        self.relu = nn.ReLU()
-
-    def forward(self, input_id, mask):
-
-        _, pooled_output = self.bert(input_ids= input_id, attention_mask=mask,return_dict=False)
-        dropout_output = self.dropout(pooled_output)
-        linear_output = self.linear(dropout_output)
-        final_layer = self.relu(linear_output)
-
-        return final_layer
-
-
-def train(model, train_data, val_data, learning_rate, epochs):
-    train, val = Dataset(train_data), Dataset(val_data)
-
-    train_dataloader = torch.utils.data.DataLoader(train, batch_size=2, shuffle=True)
-    val_dataloader = torch.utils.data.DataLoader(val, batch_size=2)
-
-    use_cuda = torch.cuda.is_available()
-    device = torch.device("cuda" if use_cuda else "cpu")
-
-    criterion = nn.CrossEntropyLoss()
-    optimizer = Adam(model.parameters(), lr=learning_rate)
-
-    if use_cuda:
-        model = model.cuda()
-        criterion = criterion.cuda()
-
-    for epoch_num in range(epochs):
-
-        total_acc_train = 0
-        total_loss_train = 0
-
-        for train_input, train_label in tqdm(train_dataloader):
-            train_label = train_label.to(device)
-            mask = train_input['attention_mask'].to(device)
-            input_id = train_input['input_ids'].squeeze(1).to(device)
-
-            output = model(input_id, mask)
-
-            batch_loss = criterion(output, train_label.long())
-            total_loss_train += batch_loss.item()
-
-            acc = (output.argmax(dim=1) == train_label).sum().item()
-            total_acc_train += acc
-
-            model.zero_grad()
-            batch_loss.backward()
+    # Training loop
+    model.train()
+    for epoch in range(3):  # You can adjust the number of epochs
+        for batch in train_dataloader:
+            optimizer.zero_grad()
+            input_ids, attention_mask, labels = batch
+            outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
+            loss = outputs.loss
+            loss.backward()
             optimizer.step()
 
-        total_acc_val = 0
-        total_loss_val = 0
-
+    # Evaluation loop
+    model.eval()
+    test_predictions = []
+    for batch in test_dataloader:
+        input_ids, attention_mask, labels = batch
         with torch.no_grad():
+            outputs = model(input_ids, attention_mask=attention_mask)
+        logits = outputs.logits
+        predictions = torch.argmax(logits, dim=1)
+        test_predictions.extend(predictions.tolist())
 
-            for val_input, val_label in val_dataloader:
-                val_label = val_label.to(device)
-                mask = val_input['attention_mask'].to(device)
-                input_id = val_input['input_ids'].squeeze(1).to(device)
+    # Calculate accuracy and classification report
+    accuracy = accuracy_score(test_labels, test_predictions)
+    report = classification_report(test_labels, test_predictions)
+    return accuracy, report
 
-                output = model(input_id, mask)
+# Train and evaluate RoBERTa model
+roberta_accuracy, roberta_report = train_and_evaluate_model(roberta_model, roberta_tokenizer, train_test_split, train_labels, test_texts, test_labels)
+print("RoBERTa Test Accuracy:", roberta_accuracy)
+print("RoBERTa Test Classification Report:\n", roberta_report)
 
-                batch_loss = criterion(output, val_label.long())
-                total_loss_val += batch_loss.item()
-
-                acc = (output.argmax(dim=1) == val_label).sum().item()
-                total_acc_val += acc
-
-        print(
-            f'Epochs: {epoch_num + 1} | Train Loss: {total_loss_train / len(train_data): .3f} | Train Accuracy: {total_acc_train / len(train_data): .3f} | Val Loss: {total_loss_val / len(val_data): .3f} | Val Accuracy: {total_acc_val / len(val_data): .3f}')
-
-
-def evaluate(model, test_data):
-    test = Dataset(test_data)
-
-    test_dataloader = torch.utils.data.DataLoader(test, batch_size=2)
-
-    use_cuda = torch.cuda.is_available()
-    device = torch.device("cuda" if use_cuda else "cpu")
-
-    if use_cuda:
-        model = model.cuda()
-
-    total_acc_test = 0
-    with torch.no_grad():
-
-        for test_input, test_label in test_dataloader:
-            test_label = test_label.to(device)
-            mask = test_input['attention_mask'].to(device)
-            input_id = test_input['input_ids'].squeeze(1).to(device)
-
-            output = model(input_id, mask)
-
-            acc = (output.argmax(dim=1) == test_label).sum().item()
-            total_acc_test += acc
-
-    print(f'Test Accuracy: {total_acc_test / len(test_data): .3f}')
-
-
-
-
-np.random.seed(112)
-df_train, df_val, df_test = np.split(df.sample(frac=1, random_state=42),
-                                     [int(.8*len(df)), int(.9*len(df))])
-
-print(len(df_train),len(df_val), len(df_test))
-
-EPOCHS = 5
-model = BertClassifier()
-LR = 1e-6
-
-train(model, df_train, df_val, LR, EPOCHS)
-
-print(evaluate(model, df_test))
+# Train and evaluate BERT model
+bert_accuracy, bert_report = train_and_evaluate_model(bert_model, bert_tokenizer, train_texts, train_labels, test_texts, test_labels)
+print("BERT Test Accuracy:", bert_accuracy)
+print("BERT Test Classification Report:\n", bert_report)
