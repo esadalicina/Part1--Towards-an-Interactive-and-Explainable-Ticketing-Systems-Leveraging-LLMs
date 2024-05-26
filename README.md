@@ -40,3 +40,8 @@ WEBSITE CODE:
 
 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
 
+
+
+
+IDEA FOR WEBSITE
+- Apply grammary for word correction to avpid incorrect spelling

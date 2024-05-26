@@ -26,17 +26,16 @@ def preprocess_text(text):
     text = text.lower()  # Convert to lower case
     text = re.sub(r'^\[[\w\s]\]+$', ' ', text)  # Remove text in square brackets
     text = re.sub(r'[^\w\s]', ' ', text)  # Remove punctuation
-    # text = re.sub(r'^[a-zA-Z]\d+\w*$', ' ', text)  # Remove words with numbers
-    text = re.sub(r'[^a-zA-Z\s]', '', text)     # Remove special characters and numbers
-    # Remove newline characters
-    text = text.replace('\n', '')
-   
-    # Tokenize and remove stopwords using spaCy
+    text = text.replace('\n', '')  # Remove newline characters
+    text = re.sub(r'[^a-zA-Z\s]', '', text)   # Remove special characters and numbers
+    text = re.sub(r'(.)\1+|\b\w\b', r'\1', text)  # Remove repeated characters and single letters
+    
+    # Tokenize and filter by POS tags using spaCy
     doc = nlp(text)
-    words = [token.text for token in doc if token.text not in stop_words]
+    filtered_tokens = [token for token in doc if token.pos_ in {'PRON', 'NOUN', 'VERB', 'ADJ'}]
     
     # Lemmatize the text using spaCy
-    lemmatized_text = ' '.join([token.lemma_ for token in nlp(' '.join(words))])
+    lemmatized_text = ' '.join([token.lemma_ for token in filtered_tokens])
     
     return lemmatized_text
 
@@ -49,9 +48,9 @@ df['complaint_what_happened_lemmatized'] = df['complaint_what_happened_lemmatize
 
 # The clean dataframe should now contain the raw and lemmatized complaint with the category and product columns
 # print(tabulate(df.head(), headers='keys', tablefmt='pretty')) # type: ignore
-print(df.head(5))
+print(df['complaint_what_happened_lemmatized'].head(5))
 
-
+print(df.info())
 # Specify the file path where you want to save the modified DataFrame as a CSV file
 # output_file = '/home/users/elicina/Master-Thesis/Dataset/Cleaned_Dataset.csv'
 

@@ -5,6 +5,8 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.model_selection import train_test_split
 from gensim.models import Word2Vec
 from nltk.tokenize import sent_tokenize, word_tokenize
+import nltk
+nltk.download('punkt')
 
 # ---------------------------------------------------------------- Choose right columns ----------------------------------------------------
 
@@ -12,7 +14,9 @@ from nltk.tokenize import sent_tokenize, word_tokenize
 file_path = "/home/users/elicina/Master-Thesis/Dataset/Cleaned_Dataset.csv"
 
 # Read the CSV file into a DataFrame
-df_clean = pd.read_csv(file_path)
+df = pd.read_csv(file_path)
+
+df_clean = df.dropna(subset=['complaint_what_happened_lemmatized'])
 
 # Keep the columns "complaint_what_happened" & "category_encoded" only in the new dataframe --> training_data
 ticket_data = df_clean['complaint_what_happened_lemmatized']
@@ -57,7 +61,7 @@ def Word2vec_method(train_texts):
                 temp.append(j.lower())
             data.append(temp)
     # Train Word2Vec model
-    w2v_model = Word2Vec(sentences=data, vector_size=200, window=5, min_count=3, workers=4, sg=1)
+    w2v_model = Word2Vec(sentences=data, vector_size=100, window=5, min_count=2, workers=4)
     return w2v_model
 
 # Function to average word vectors for each document
@@ -82,4 +86,28 @@ test_embeddings = get_word2vec_embeddings(test_texts, w2v_model)
 # Handle class imbalance using SMOTE on Word2Vec embeddings
 train_embeddings_resampled, train_labels_resampled_w2v = smote.fit_resample(train_embeddings, train_labels) # type: ignore
 
+
+# ----------------------------------------------------------------- View Data ----------------------------------------------------------
+
+# Check for get_feature_names_out or fall back to get_feature_names
+try:
+    feature_names = count_vect.get_feature_names_out()
+except AttributeError:
+    feature_names = count_vect.get_feature_names() # type: ignore
+
+# Convert the resampled TF-IDF data to a DataFrame for viewing
+tfidf_df = pd.DataFrame(X_train_tf_resampled.toarray(), columns=feature_names) # type: ignore
+tfidf_df['label'] = train_labels_resampled.values
+
+# Display a few rows of the TF-IDF DataFrame
+print("TF-IDF Features with Resampled Labels:")
+print(tfidf_df.head())
+
+# Convert the resampled Word2Vec embeddings to a DataFrame for viewing
+w2v_df = pd.DataFrame(train_embeddings_resampled)
+w2v_df['label'] = train_labels_resampled_w2v.values
+
+# Display a few rows of the Word2Vec DataFrame
+print("\nWord2Vec Embeddings with Resampled Labels:")
+print(w2v_df.head())
 
