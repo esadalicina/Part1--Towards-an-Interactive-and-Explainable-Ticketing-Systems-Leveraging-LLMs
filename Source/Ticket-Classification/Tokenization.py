@@ -43,6 +43,8 @@ def Tfidf_method(training_data, count_vect=None, tfidf_transformer=None):
 X_train_tf, count_vect, tfidf_transformer = Tfidf_method(train_texts)
 X_test_tf, _, _ = Tfidf_method(test_texts, count_vect, tfidf_transformer)
 
+
+
 # Handle class imbalance using SMOTE on TF-IDF features
 smote = SMOTE(random_state=42)
 X_train_tf_resampled, train_labels_resampled = smote.fit_resample(X_train_tf, train_labels) # type: ignore
