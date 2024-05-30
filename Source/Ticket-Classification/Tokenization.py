@@ -23,7 +23,7 @@ ticket_data = df_clean['complaint_what_happened_lemmatized']
 label_data = df_clean['category_encoded']
 
 # Split the data into training and testing sets
-train_texts, test_texts, train_labels, test_labels = train_test_split(ticket_data, label_data, test_size=0.3, random_state=42, shuffle=True)
+train_texts, test_texts, train_labels, test_labels = train_test_split(ticket_data, label_data, test_size=0.2, random_state=42, shuffle=True)
 
 
 # ----------------------------------------------------------------- Tokenization with Tfidf ----------------------------------------------------------
@@ -55,22 +55,20 @@ def Word2vec_method(train_texts):
     # Tokenize the training texts
     data = []
     for text in train_texts:
-        # iterate through each sentence in the file
-        for i in sent_tokenize(text):
-            temp = []
-            # tokenize the sentence into words
-            for j in word_tokenize(i):
-                temp.append(j.lower())
-            data.append(temp)
+        temp = []
+        # tokenize the sentence into words
+        for j in word_tokenize(text):
+            temp.append(j.lower())
+        data.append(temp)
     # Train Word2Vec model
-    w2v_model = Word2Vec(sentences=data, vector_size=100, window=5, min_count=2, workers=4)
+    w2v_model = Word2Vec(sentences=data, vector_size=200, window=5, min_count=7, workers=4)
     return w2v_model
 
 # Function to average word vectors for each document
 def get_word2vec_embeddings(texts, model):
     embeddings = []
     for text in texts:
-        tokens = text.split()
+        tokens = word_tokenize(text)
         vectors = [model.wv[token] for token in tokens if token in model.wv]
         if vectors:
             vector = np.mean(vectors, axis=0)
@@ -86,7 +84,7 @@ train_embeddings = get_word2vec_embeddings(train_texts, w2v_model)
 test_embeddings = get_word2vec_embeddings(test_texts, w2v_model)
 
 # Handle class imbalance using SMOTE on Word2Vec embeddings
-train_embeddings_resampled, train_labels_resampled_w2v = smote.fit_resample(train_embeddings, train_labels) # type: ignore
+# train_embeddings_resampled, train_labels_resampled_w2v = smote.fit_resample(train_embeddings, train_labels) # type: ignore
 
 
 # ----------------------------------------------------------------- View Data ----------------------------------------------------------
@@ -106,10 +104,23 @@ print("TF-IDF Features with Resampled Labels:")
 print(tfidf_df.head())
 
 # Convert the resampled Word2Vec embeddings to a DataFrame for viewing
-w2v_df = pd.DataFrame(train_embeddings_resampled)
-w2v_df['label'] = train_labels_resampled_w2v.values
+w2v_df = pd.DataFrame(test_embeddings)
+w2v_df['label'] = test_labels.values
 
 # Display a few rows of the Word2Vec DataFrame
 print("\nWord2Vec Embeddings with Resampled Labels:")
-print(w2v_df.head())
+print(w2v_df.head(17))
+
+
+# Convert the resampled Word2Vec embeddings to a DataFrame for viewing
+w2v_df = pd.DataFrame(train_embeddings)
+w2v_df['label'] = train_labels.values
+
+# Display a few rows of the Word2Vec DataFrame
+print("\nWord2Vec Embeddings with Resampled Labels:")
+print(w2v_df.head(17))
+
+print("Train", train_embeddings.shape)
+print("label", train_labels.shape)
+
 

@@ -1,7 +1,6 @@
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
@@ -79,7 +78,6 @@ classifiers = {
     'RandomForest': RandomForestClassifier(),
     'LogisticRegression': LogisticRegression(max_iter=3000),
     'SVC': SVC(),
-    'NB': GaussianNB(),
     'DT': DecisionTreeClassifier()
 }
 
