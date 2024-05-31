@@ -89,5 +89,5 @@ early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_wei
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=5, min_lr=0.0001)
 
 # Train the model
-model.fit(X_train_pad, Y_train, epochs=100, batch_size=128, 
+model.fit(X_train_pad, Y_train, epochs=100, batch_size=32, 
           validation_data=(X_val_pad, Y_val), callbacks=[early_stopping, reduce_lr]) 

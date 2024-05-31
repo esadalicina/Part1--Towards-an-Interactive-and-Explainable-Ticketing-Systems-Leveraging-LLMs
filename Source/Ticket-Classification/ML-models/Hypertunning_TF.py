@@ -73,7 +73,9 @@ parameters = {
         'clf__max_depth': [None, 10, 20, 30]
     },
     'LogisticRegression': {
-        'clf__C': [0.01, 0.1, 1, 10, 100]
+        'clf__C': [0.01, 0.1, 1, 10, 100],
+        'clf__penalty': ['l1', 'l2'],
+        'clf__solver': ['liblinear','newton-cg','saga']
     },
     'SVC': {
         'clf__C': [0.01, 0.1, 1, 10, 100],
