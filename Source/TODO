@@ -29,3 +29,42 @@ OPENAI Solutions:
 - Discord has bots in it so use it for tasks
 - Build channels and into that channels, build priority queues and assign tickets to the queues.
 - Build also an conversation queue for the agents.
+
+
+
+
+TODO: 
+
+ML model:
+- Test with stopwords and without
+- Look for the wrong classified tickets
+- Save best model
+
+DL model:
+- Test with and without stopwords
+- Test with model embeding 
+- Test with model embeding and tf together
+- Look for the wrong classified tickets
+- Save best model 
+
+LLM model
+- Test with and without stopwords
+- Test pipeline model
+- Test TFBertclasififer and the normal one for sequnececlassification
+- Try summaize the tickets and look results
+- Save models
+
+Tag extrcation
+- Use normal extraction tags method
+
+
+Visualisation:
+- All results of metrics
+- Unbalanced and balanced data
+- Confucion matrix of each best model
+
+
+Discord:
+- Watch the videos
+- Look at copilot
+- Streamlit has good chatbot features and authenication user

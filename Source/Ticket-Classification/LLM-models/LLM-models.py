@@ -1,9 +1,8 @@
-# Import the necessary libraries
+# Import necessary libraries
 import torch
 import pandas as pd
 from torch.utils.data import DataLoader, TensorDataset, RandomSampler, SequentialSampler
-from transformers.models.bert.tokenization_bert import BertTokenizer
-from transformers.utils.dummy_pt_objects import BertForSequenceClassification, AdamW
+from transformers import BertTokenizer, BertForSequenceClassification, AdamW
 
 # Specify the file path of your CSV file
 file_path = "/home/users/elicina/Master-Thesis/Dataset/Cleaned_Dataset.csv"
@@ -15,22 +14,26 @@ df = pd.read_csv(file_path)
 df_clean = df.dropna(subset=['complaint_what_happened_lemmatized'])
 
 # Extract the relevant columns for training
-ticket_data = df_clean['complaint_what_happened_lemmatized'].tolist() # type: ignore
-label_data = df_clean['category_encoded'].tolist() # type: ignore
+ticket_data = df_clean['complaint_what_happened_lemmatized'].tolist()  # type: ignore
+label_data = df_clean['category_encoded'].tolist()  # type: ignore
 
 print("Number of ticket data:", len(ticket_data))
 print("Number of label data:", len(label_data))
 print("Sample label data:", label_data[:10])  # Print first few labels for debugging
 print("Unique label values:", set(label_data))
 
-# Preprocess the data
+# Define the maximum length for BERT input (maximum length BERT can handle is 512 tokens)
+max_length = 512
+
+# Preprocess the data with padding and truncation
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
 encoded_data = tokenizer.batch_encode_plus(
     ticket_data, 
     add_special_tokens=True, 
     return_attention_mask=True, 
     padding='max_length', 
-    max_length=256, 
+    max_length=max_length,  # Use a fixed maximum length
+    truncation=True,
     return_tensors='pt'
 )
 
@@ -53,7 +56,7 @@ model.to(device)
 optimizer = AdamW(model.parameters(), lr=1e-5)
 
 # Train the model
-epochs = 50
+epochs = 100
 
 for epoch in range(epochs):
     print(f"Epoch {epoch+1}/{epochs}")
@@ -62,13 +65,13 @@ for epoch in range(epochs):
     for step, batch in enumerate(dataloader):
         batch_input_ids, batch_attention_masks, batch_labels = tuple(t.to(device) for t in batch)
         
-        optimizer.zero_grad() # type: ignore
+        optimizer.zero_grad()  # Reset gradients
         outputs = model(input_ids=batch_input_ids, attention_mask=batch_attention_masks, labels=batch_labels)
         loss = outputs.loss
         total_loss += loss.item()
         
         loss.backward()
-        optimizer.step() # type: ignore
+        optimizer.step()  # Update parameters
         
         if step % 10 == 0 and step > 0:
             print(f"  Batch {step} of {len(dataloader)}. Loss: {loss.item()}")
@@ -80,7 +83,7 @@ for epoch in range(epochs):
 model.eval()
 with torch.no_grad():
     all_predictions = []
-    for batch in DataLoader(dataset, sampler=SequentialSampler(dataset), batch_size=16):
+    for batch in DataLoader(dataset, sampler=SequentialSampler(dataset), batch_size=32):
         batch_input_ids, batch_attention_masks, batch_labels = tuple(t.to(device) for t in batch)
         
         outputs = model(input_ids=batch_input_ids, attention_mask=batch_attention_masks)
@@ -89,3 +92,11 @@ with torch.no_grad():
     
     accuracy = (torch.tensor(all_predictions) == labels).sum().item() / len(labels)
     print("Accuracy:", accuracy)
+
+# Save the trained model
+# model.save_pretrained("/path/to/save/your/model")
+# tokenizer.save_pretrained("/path/to/save/your/model")
+
+# Load the model for inference
+# model = BertForSequenceClassification.from_pretrained("/path/to/save/your/model")
+# tokenizer = BertTokenizer.from_pretrained("/path/to/save/your/model")

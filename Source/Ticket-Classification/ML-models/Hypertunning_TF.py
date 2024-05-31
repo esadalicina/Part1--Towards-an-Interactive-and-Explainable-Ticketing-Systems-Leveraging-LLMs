@@ -1,7 +1,6 @@
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
@@ -69,13 +68,14 @@ classifiers = {
 # Define grid search parameters for different classifiers
 parameters = {
     'RandomForest': {
-        'clf__n_estimators': [50, 100, 200],
-        'clf__max_depth': [None, 10, 20, 30]
+        'clf__n_estimators': [100,200,500,700],
+        'clf__min_samples_leaf': [5,10,30],
+        'clf__max_depth': [None, 20, 30, 40]
     },
     'LogisticRegression': {
-        'clf__C': [0.01, 0.1, 1, 10, 100],
-        'clf__penalty': ['l1', 'l2'],
-        'clf__solver': ['liblinear','newton-cg','saga']
+        'clf__C': [0.01, 0.1, 1, 10],
+        'clf__penalty': ['l1'],
+        'clf__solver': ['liblinear','saga']
     },
     'SVC': {
         'clf__C': [0.01, 0.1, 1, 10, 100],

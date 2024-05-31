@@ -96,16 +96,17 @@ parameters = {
         'w2v__vector_size': [100, 150, 200, 250, 300],
         'w2v__window': [2, 5, 7, 10],
         'w2v__min_count': [1, 2],
-        'clf__n_estimators': [50, 100, 200],
-        'clf__max_depth': [None, 10, 20, 30]
+        'clf__n_estimators': [100,200,500,700],
+        'clf__min_samples_leaf': [5,10,30],
+        'clf__max_depth': [None, 20, 30, 40]
     },
     'LogisticRegression': {
         'w2v__vector_size': [100, 150, 200, 250, 300],
         'w2v__window': [2, 5, 7, 10],
         'w2v__min_count': [1, 2],
-        'clf__C': [0.01, 0.1, 1, 10, 100],
-        'clf__penalty': ['l1', 'l2'],
-        'clf__solver': ['liblinear','newton-cg','saga']
+        'clf__C': [0.01, 0.1, 1, 10],
+        'clf__penalty': ['l1'],
+        'clf__solver': ['liblinear','saga']
     },
     'SVC': {
         'w2v__vector_size': [100, 150, 200, 250, 300],
