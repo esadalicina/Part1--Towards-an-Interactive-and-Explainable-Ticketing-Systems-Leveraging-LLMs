@@ -1,5 +1,5 @@
 import pandas as pd
-from transformers.pipelines import pipeline
+from transformers import pipeline
 from sklearn.metrics import classification_report
 
 # Initialize the pipeline for zero-shot classification using the RoBERTa model

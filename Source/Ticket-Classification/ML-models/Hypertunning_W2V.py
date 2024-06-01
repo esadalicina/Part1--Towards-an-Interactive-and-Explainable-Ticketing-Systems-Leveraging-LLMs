@@ -25,9 +25,13 @@ df = pd.read_csv(file_path)
 
 # Clean the DataFrame
 df_clean = df.dropna(subset=['complaint_what_happened_lemmatized'])
+# df_clean = df.dropna(subset=['complaint_what_happened_without_stopwords'])
+
 
 # Extract the relevant columns
-ticket_data = df_clean['complaint_what_happened_lemmatized']
+ticket_data = df_clean['complaint_what_happened_without_stopwords']
+# ticket_data = df_clean['complaint_what_happened_lemmatized']
+
 label_data = df_clean['category_encoded']
 
 # Split the data into training and testing sets

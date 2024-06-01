@@ -48,9 +48,13 @@ dataloader = DataLoader(dataset, sampler=RandomSampler(dataset), batch_size=16)
 # Load the pre-trained BERT model
 model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=5, output_attentions=False, output_hidden_states=False)
 
-# Check if GPU is available and move the model to GPU if possible
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model.to(device)
+
+if torch.cuda.is_available():
+    print("CUDA is available. Using GPU.")
+    device = torch.device('cuda')
+else:
+    print("CUDA is not available. Using CPU.")
+    device = torch.device('cpu')
 
 # Define the optimizer
 optimizer = AdamW(model.parameters(), lr=1e-5)
