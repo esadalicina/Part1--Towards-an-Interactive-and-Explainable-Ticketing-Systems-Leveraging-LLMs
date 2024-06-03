@@ -21,12 +21,7 @@ nltk.download('punkt')
 file_path = "/home/users/elicina/Master-Thesis/Dataset/Cleaned_Dataset.csv"
 
 # Read the CSV file into a DataFrame
-df = pd.read_csv(file_path)
-
-# Clean the DataFrame
-df_clean = df.dropna(subset=['complaint_what_happened_lemmatized'])
-# df_clean = df.dropna(subset=['complaint_what_happened_without_stopwords'])
-
+df_clean = pd.read_csv(file_path)
 
 # Extract the relevant columns
 ticket_data = df_clean['complaint_what_happened_without_stopwords']
