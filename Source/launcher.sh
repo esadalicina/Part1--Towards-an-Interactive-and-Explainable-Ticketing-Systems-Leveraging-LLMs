@@ -6,7 +6,7 @@
 #SBATCH --time=2:00:00
 #SBATCH --qos=normal
 #SBATCH --partition=gpu
-#SBATCH --mem=0
+#SBATCH --mem=02
 #SBATCH --mail-user=esada66@hotmail.com
 #SBATCH --mail-type=all
 
