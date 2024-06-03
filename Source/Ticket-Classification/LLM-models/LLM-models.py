@@ -1,8 +1,9 @@
-# Import necessary libraries
 import torch
+import os
 import pandas as pd
-from torch.utils.data import DataLoader, TensorDataset, RandomSampler, SequentialSampler
-from transformers import BertTokenizer, BertForSequenceClassification, AdamW
+from transformers import BertTokenizer, BertForSequenceClassification
+from sklearn.model_selection import train_test_split
+
 
 # Specify the file path of your CSV file
 file_path = "/home/users/elicina/Master-Thesis/Dataset/Cleaned_Dataset.csv"
@@ -10,92 +11,59 @@ file_path = "/home/users/elicina/Master-Thesis/Dataset/Cleaned_Dataset.csv"
 # Read the CSV file into a DataFrame
 df = pd.read_csv(file_path)
 
-# Clean the dataset by removing rows with NaN values in 'complaint_what_happened_lemmatized'
+# Drop rows with missing values in 'complaint_what_happened_lemmatized'
 df_clean = df.dropna(subset=['complaint_what_happened_lemmatized'])
 
-# Extract the relevant columns for training
-ticket_data = df_clean['complaint_what_happened_lemmatized'].tolist()  # type: ignore
-label_data = df_clean['category_encoded'].tolist()  # type: ignore
+# Keep the columns "complaint_what_happened" & "category_encoded" only in the new dataframe
+ticket_data = df_clean['complaint_what_happened_lemmatized']
+label_data = df_clean['category_encoded']
 
-print("Number of ticket data:", len(ticket_data))
-print("Number of label data:", len(label_data))
-print("Sample label data:", label_data[:10])  # Print first few labels for debugging
-print("Unique label values:", set(label_data))
+# Split the data into train and test sets
+train_texts, test_texts, train_labels, test_labels = train_test_split(ticket_data, label_data, test_size=0.2, random_state=42)
 
-# Define the maximum length for BERT input (maximum length BERT can handle is 512 tokens)
-max_length = 512
-
-# Preprocess the data with padding and truncation
+# Initialize the BERT tokenizer
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
-encoded_data = tokenizer.batch_encode_plus(
-    ticket_data, 
-    add_special_tokens=True, 
-    return_attention_mask=True, 
-    padding='max_length', 
-    max_length=max_length,  # Use a fixed maximum length
-    truncation=True,
-    return_tensors='pt'
-)
 
-input_ids = encoded_data['input_ids']
-attention_masks = encoded_data['attention_mask']
-labels = torch.tensor(label_data)
+# Tokenize and encode the training and test data
+train_encodings = tokenizer(list(train_texts), truncation=True, padding=True)
+test_encodings = tokenizer(list(test_texts), truncation=True, padding=True)
 
-# Create the DataLoader
-dataset = TensorDataset(input_ids, attention_masks, labels)
-dataloader = DataLoader(dataset, sampler=RandomSampler(dataset), batch_size=16)
+# Convert the encoded inputs to PyTorch tensors
+train_inputs = torch.tensor(train_encodings['input_ids'])
+train_masks = torch.tensor(train_encodings['attention_mask'])
+train_labels = torch.tensor(train_labels.values)
+
+test_inputs = torch.tensor(test_encodings['input_ids'])
+test_masks = torch.tensor(test_encodings['attention_mask'])
+test_labels = torch.tensor(test_labels.values)
 
 # Load the pre-trained BERT model
-model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=5, output_attentions=False, output_hidden_states=False)
+model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=5)
 
-
-if torch.cuda.is_available():
-    print("CUDA is available. Using GPU.")
-    device = torch.device('cuda')
-else:
-    print("CUDA is not available. Using CPU.")
-    device = torch.device('cpu')
-
-# Define the optimizer
-optimizer = AdamW(model.parameters(), lr=1e-5)
+# Define the training parameters
+batch_size = 32
+epochs = 50
+optimizer = torch.optim.AdamW(model.parameters(), lr=1e-5)
 
 # Train the model
-epochs = 100
-
 for epoch in range(epochs):
-    print(f"Epoch {epoch+1}/{epochs}")
     model.train()
-    total_loss = 0
-    for step, batch in enumerate(dataloader):
-        batch_input_ids, batch_attention_masks, batch_labels = tuple(t.to(device) for t in batch)
-        
-        optimizer.zero_grad()  # Reset gradients
-        outputs = model(input_ids=batch_input_ids, attention_mask=batch_attention_masks, labels=batch_labels)
+    for i in range(0, len(train_inputs), batch_size):
+        optimizer.zero_grad()
+        outputs = model(input_ids=train_inputs[i:i+batch_size], attention_mask=train_masks[i:i+batch_size], labels=train_labels[i:i+batch_size])
         loss = outputs.loss
-        total_loss += loss.item()
-        
         loss.backward()
-        optimizer.step()  # Update parameters
-        
-        if step % 10 == 0 and step > 0:
-            print(f"  Batch {step} of {len(dataloader)}. Loss: {loss.item()}")
-    
-    avg_train_loss = total_loss / len(dataloader)
-    print(f"Average training loss: {avg_train_loss}")
+        optimizer.step()
 
 # Evaluate the model
 model.eval()
 with torch.no_grad():
-    all_predictions = []
-    for batch in DataLoader(dataset, sampler=SequentialSampler(dataset), batch_size=32):
-        batch_input_ids, batch_attention_masks, batch_labels = tuple(t.to(device) for t in batch)
-        
-        outputs = model(input_ids=batch_input_ids, attention_mask=batch_attention_masks)
-        predictions = torch.argmax(outputs.logits, dim=-1).flatten()
-        all_predictions.extend(predictions.cpu().numpy())
-    
-    accuracy = (torch.tensor(all_predictions) == labels).sum().item() / len(labels)
-    print("Accuracy:", accuracy)
+    outputs = model(input_ids=test_inputs, attention_mask=test_masks)
+    predictions = torch.argmax(outputs.logits, dim=1)
+    accuracy = (predictions == test_labels).float().mean()
+
+print("Accuracy:", accuracy.item())
+
 
 # Save the trained model
 # model.save_pretrained("/path/to/save/your/model")

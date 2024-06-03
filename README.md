@@ -12,7 +12,13 @@ LLM-based ticketing system
 - 0 [elicina@access2 ~]$ ls (See files)
 - 0 [elicina@access2 ~]$ rm -r ... (Remove files/directories)
 - 0 [elicina@access2 ~]$ si (enter Node for exucation of code)
+- 0 [elicina@iris-056 Master-Thesis](3489962 1N/T/1CN)$ python /home/users/elicina/Master-Thesis/Source/Ticket-Classification/LLM-models/SimpleLMM.py
 - 0 [elicina@access2 ]$ exit (Get out of cluster)
+
+## VSC
+- source /home/users/elicina/.virtualenvs/Master-Thesis/bin/activate
+- conda activate myenv
+
 
 PYTHON Tutorial: https://github.com/ULHPC/tutorials/tree/devel/python/basics
 
