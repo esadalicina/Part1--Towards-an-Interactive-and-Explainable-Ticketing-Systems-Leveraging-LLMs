@@ -1,10 +1,13 @@
+import os
+from matplotlib import pyplot as plt
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import Pipeline
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
+from sklearn.metrics import accuracy_score, confusion_matrix, precision_score, recall_score, f1_score, classification_report
 import pandas as pd
+import seaborn as sns
 import numpy as np
 from sklearn.model_selection import RandomizedSearchCV, train_test_split
 from gensim.models import Word2Vec
@@ -24,7 +27,7 @@ file_path = "/home/users/elicina/Master-Thesis/Dataset/Cleaned_Dataset.csv"
 df_clean = pd.read_csv(file_path)
 
 # Extract the relevant columns
-ticket_data = df_clean['complaint_what_happened_without_stopwords']
+ticket_data = df_clean['complaint_what_happened_lemmatized']
 # ticket_data = df_clean['complaint_what_happened_lemmatized']
 
 label_data = df_clean['category_encoded']
@@ -154,13 +157,24 @@ for clf_name, clf in classifiers.items():
     # Transform the test data and make predictions
     test_predictions = test_pipeline.predict(test_texts)
     
+    # Function to plot confusion matrix
+    def plot_confusion_matrix(y_true, y_pred, classes, filename):
+        cm = confusion_matrix(y_true, y_pred)
+        plt.figure(figsize=(10, 7))
+        sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=classes, yticklabels=classes)
+        plt.xlabel('Predicted')
+        plt.ylabel('Actual')
+        plt.title('Confusion Matrix')
+        plt.savefig(filename)  # Save the plot to a file
+        plt.close()  # Close the plot to prevent it from displaying
+
     # Evaluate the model performance
     accuracy = accuracy_score(test_labels, test_predictions)
     precision = precision_score(test_labels, test_predictions, average='weighted')
     recall = recall_score(test_labels, test_predictions, average='weighted')
     f1 = f1_score(test_labels, test_predictions, average='weighted')
     report = classification_report(test_labels, test_predictions)
-    
+
     # Store the results
     results[clf_name] = {
         'accuracy': accuracy,
@@ -169,7 +183,7 @@ for clf_name, clf in classifiers.items():
         'f1': f1,
         'report': report
     }
-    
+
     # Print the evaluation metrics
     print(f"Results for {clf_name}:")
     print(f'Accuracy: {accuracy}')
@@ -177,3 +191,23 @@ for clf_name, clf in classifiers.items():
     print(f'Recall: {recall}')
     print(f'F1 Score: {f1}')
     print(f'Classification Report:\n{report}\n')
+
+    # Plot the confusion matrix
+    # unique_classes = test_labels.unique()  # type: ignore # Get unique class labels from the test set
+    # confusion_matrix_filename = os.path.join("/home/users/elicina/Master-Thesis/Source/Digrams/ML-Results/W2V",f"{clf_name}.png")
+    # plot_confusion_matrix(test_labels, test_predictions, unique_classes, confusion_matrix_filename)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
