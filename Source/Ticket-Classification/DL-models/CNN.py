@@ -1,12 +1,25 @@
 from sklearn.model_selection import train_test_split
-from Tokenization import *
 import numpy as np
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv1D, GlobalMaxPooling1D, Dense, Dropout, BatchNormalization, MaxPooling1D, Flatten
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 
+import sys
+import os
 
-X_train, X_val, Y_train, Y_val = train_test_split(train_embeddings, train_labels, test_size=0.2, random_state=42, shuffle=True)
+# Get the absolute path of the directory containing other_script.py
+other_directory_path = os.path.abspath('/home/users/elicina/Master-Thesis/Source/Ticket-Classification')
+
+# Add the directory to sys.path
+sys.path.append(other_directory_path)
+
+# Now you can import the module
+import Tokenization 
+from Tokenization import *
+
+
+
+X_train, X_val, Y_train, Y_val = train_test_split(train_embeddings, train_labels, test_size=0.1, random_state=42, shuffle=True)
 
 train_embeddings_resampled, train_labels_resampled_w2v = smote.fit_resample(X_train, Y_train) # type: ignore
 
@@ -24,23 +37,24 @@ model.add(Conv1D(filters=128, kernel_size=5, activation='relu', input_shape=(tra
 model.add(BatchNormalization())
 model.add(MaxPooling1D(pool_size=2))
 
-# Second Conv1D layer
 model.add(Conv1D(filters=128, kernel_size=5, activation='relu'))
 model.add(BatchNormalization())
 model.add(MaxPooling1D(pool_size=2))
 
-# Third Conv1D layer
 model.add(Conv1D(filters=128, kernel_size=5, activation='relu'))
 model.add(BatchNormalization())
 model.add(MaxPooling1D(pool_size=2))
+model.add(Dropout(0.5))
 
-# Fourth Conv1D layer
+model.add(Conv1D(filters=128, kernel_size=5, activation='relu'))
+model.add(BatchNormalization())
+model.add(MaxPooling1D(pool_size=2))
+model.add(Dropout(0.5))
+
+
 model.add(Conv1D(filters=128, kernel_size=5, activation='relu'))
 model.add(BatchNormalization())
 model.add(GlobalMaxPooling1D())
-
-# Flatten the output
-model.add(Flatten())
 
 # Fully connected layer
 model.add(Dense(128, activation='relu', kernel_regularizer='l2'))
@@ -59,6 +73,10 @@ early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_wei
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=5, min_lr=0.0001)
 
 # Train the model
-model.fit(train_embeddings_resampled, train_labels_resampled_w2v, epochs=100, batch_size=128, 
+model.fit(train_embeddings_resampled, train_labels_resampled_w2v, epochs=100, batch_size=32, 
           validation_data=(X_val, Y_val), callbacks=[early_stopping, reduce_lr]) 
 
+# Evaluate the model on the test data
+test_loss, test_accuracy = model.evaluate(test_embeddings, test_labels)
+print(f'Test Loss: {test_loss}')
+print(f'Test Accuracy: {test_accuracy}')

@@ -1,9 +1,21 @@
 from sklearn.model_selection import train_test_split
-from Tokenization import *
 import numpy as np
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv1D, SpatialDropout1D, Dense, Dropout, Bidirectional, LSTM
+from tensorflow.keras.layers import Conv1D, GlobalMaxPooling1D, Dense, Dropout, Bidirectional, LSTM
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
+
+import sys
+import os
+
+# Get the absolute path of the directory containing other_script.py
+other_directory_path = os.path.abspath('/home/users/elicina/Master-Thesis/Source/Ticket-Classification')
+
+# Add the directory to sys.path
+sys.path.append(other_directory_path)
+
+# Now you can import the module
+import Tokenization 
+from Tokenization import *
 
 
 X_train, X_val, Y_train, Y_val = train_test_split(train_embeddings, train_labels, test_size=0.2, random_state=42, shuffle=True)
@@ -21,15 +33,18 @@ model = Sequential()
 
 model.add(Conv1D(filters=128, kernel_size=5, activation='relu', input_shape=(train_embeddings_resampled.shape[1], 1)))
 
-# Optional: Spatial Dropout for regularization
-model.add(SpatialDropout1D(0.2))
+model.add(Bidirectional(LSTM(units=128, return_sequences=True)))
 
-# Bidirectional LSTM Layer
-model.add(Bidirectional(LSTM(100, return_sequences=True)))
-model.add(Bidirectional(LSTM(100)))  # Another LSTM layer for more complex learning
+# Sentence-level context encoder (another Bidirectional LSTM)
+model.add(Bidirectional(LSTM(units=128, return_sequences=True)))
 
-# Dropout for regularization
-model.add(Dropout(0.5))
+# Global pooling layer
+model.add(GlobalMaxPooling1D())
+
+# Dense layer
+model.add(Dense(units=128, activation='relu'))
+
+model.add(Dropout(rate=0.5))
 
 # Output layer
 model.add(Dense(5, activation='softmax'))
@@ -48,3 +63,8 @@ reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=5, min_lr
 model.fit(train_embeddings_resampled, train_labels_resampled_w2v, epochs=100, batch_size=64, 
           validation_data=(X_val, Y_val), callbacks=[early_stopping, reduce_lr]) 
 
+
+# Evaluate the model on the test data
+test_loss, test_accuracy = model.evaluate(test_embeddings, test_labels)
+print(f'Test Loss: {test_loss}')
+print(f'Test Accuracy: {test_accuracy}')

@@ -27,7 +27,7 @@ file_path = "/home/users/elicina/Master-Thesis/Dataset/Cleaned_Dataset.csv"
 df_clean = pd.read_csv(file_path)
 
 # Extract the relevant columns
-ticket_data = df_clean['complaint_what_happened_lemmatized']
+ticket_data = df_clean['complaint_what_happened']
 # ticket_data = df_clean['complaint_what_happened_lemmatized']
 
 label_data = df_clean['category_encoded']
