@@ -24,18 +24,13 @@ candidate_labels = label_data.unique()  # type: ignore # Use unique category enc
 true_labels = []
 predicted_labels = []
 
-print("1")
-
 # Perform classification for each sequence in the dataset
 for sequence, true_label in zip(ticket_data, label_data):
-    print("2")
+    print("1")
     result = classifier(sequence, candidate_labels)
     predicted_label = result['labels'][0] # type: ignore
-    print("3")
     true_labels.append(true_label)
-    print("4")
     predicted_labels.append(predicted_label)
-    print("5")
 
 print("6")
 # Generate and print the classification report

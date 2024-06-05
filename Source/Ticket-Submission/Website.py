@@ -71,6 +71,7 @@ def main():
             # Clear session state after submission
             st.session_state.selected_category = None
             st.session_state.description = ""
+            st.experimental_rerun()
 
     # ------------------------------------------------ Solution suggestions --------------------------------------------
 
