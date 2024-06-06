@@ -10,9 +10,7 @@ from imblearn.over_sampling import SMOTE
 file_path = "/home/users/elicina/Master-Thesis/Dataset/Cleaned_Dataset.csv"
 
 # Read the CSV file into a DataFrame
-df = pd.read_csv(file_path)
-
-df_clean = df.dropna(subset=['complaint_what_happened_lemmatized'])
+df_clean = pd.read_csv(file_path)
 
 # Keep the columns "complaint_what_happened" & "category_encoded" only in the new dataframe --> training_data
 ticket_data = df_clean['complaint_what_happened_lemmatized']
@@ -55,7 +53,6 @@ def tokenize_data(tokenizer, texts, max_length):
 # Train and evaluate RoBERTa and BERT models
 def train_and_evaluate_model(model, tokenizer,train_texts, train_labels, test_texts, test_labels):
 
-    print("1")
     # Tokenize and encode training data
     train_input_ids, train_attention_masks = tokenize_data(tokenizer, train_texts, max_length=300)
     train_labels_tensor = torch.tensor(train_labels.values, dtype=torch.long)
@@ -78,7 +75,7 @@ def train_and_evaluate_model(model, tokenizer,train_texts, train_labels, test_te
 
     # Training loop
     model.train()
-    for epoch in range(20):  # You can adjust the number of epochs
+    for epoch in range(3):  # You can adjust the number of epochs
         print("2")
         for batch in train_dataloader:
             input_ids, attention_mask, labels = batch
@@ -93,7 +90,6 @@ def train_and_evaluate_model(model, tokenizer,train_texts, train_labels, test_te
     test_predictions = []
     test_true_labels = []
     for batch in test_dataloader:
-        print("3")
         input_ids, attention_mask, labels = batch
         with torch.no_grad():
             outputs = model(input_ids, attention_mask=attention_mask)

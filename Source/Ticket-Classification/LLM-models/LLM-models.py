@@ -65,13 +65,12 @@ model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_l
 optimizer = AdamW(model.parameters(), lr=1e-5, weight_decay=0.01)
 
 # Train the model with early stopping
-epochs = 30
+epochs = 3
 early_stopping_patience = 3
 best_val_loss = float('inf')
 patience_counter = 0
 
 for epoch in range(epochs):
-    print(f"Epoch {epoch+1}/{epochs}")
     model.train()
     total_loss = 0
     correct_predictions = 0
@@ -91,8 +90,8 @@ for epoch in range(epochs):
         correct_predictions += (predictions == batch_labels).sum().item()
         total_predictions += batch_labels.size(0)
         
-        if step % 10 == 0 and step > 0:
-            print(f"  Batch {step} of {len(train_dataloader)}. Loss: {loss.item()}")
+        # if step % 10 == 0 and step > 0:
+            # print(f"  Batch {step} of {len(train_dataloader)}. Loss: {loss.item()}")
     
     avg_train_loss = total_loss / len(train_dataloader)
     train_accuracy = correct_predictions / total_predictions

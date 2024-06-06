@@ -13,3 +13,4 @@ warnings
 tqdm 
 spacy
 streamlit 
+sentencepiece

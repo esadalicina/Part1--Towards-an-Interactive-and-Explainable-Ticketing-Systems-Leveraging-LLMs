@@ -1,3 +1,4 @@
+from datetime import datetime
 import streamlit as st
 import pandas as pd
 import time
@@ -69,7 +70,7 @@ def ticket_submission(df):
                 "Description": st.session_state.description,
                 "Priority": priority,
                 "Status": "Unsolved",
-                "Submission Time": time.time()
+                "Submission Time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
             new_ticket_df = pd.DataFrame([new_ticket])
             if 'tickets' not in st.session_state:
