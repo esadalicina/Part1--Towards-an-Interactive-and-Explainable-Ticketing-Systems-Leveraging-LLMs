@@ -1,13 +1,11 @@
 #!/bin/bash -l
 #SBATCH --job-name=Simple-LLM
-#SBATCH --nodes=1
-#SBATCH --gpus-per-node=2
-#SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-gpu=8
-#SBATCH --time=2:00:00
-#SBATCH --qos=normal
 #SBATCH --partition=gpu
-#SBATCH --mem=0
+#SBATCH --qos=normal
+#SBATCH -c 8
+#SBATCH -t 120
+#SBATCH -N 1
+#SBATCH --export=ALL
 
 
 print_error_and_exit() { echo "***ERROR*** $*"; exit 1; }
@@ -21,7 +19,7 @@ source /home/users/elicina/.virtualenvs/Master-Thesis/bin/activate || print_erro
  
 # Run your Python script
 # python /home/users/elicina/Master-Thesis/Source/Ticket-Classification/RB.py || print_error_and_exit "Python script execution failed"
-python /home/users/elicina/Master-Thesis/Source/Ticket-Classification/LLM-models/SimpleLMM.py || print_error_and_exit "Python script execution failed"
+python /home/users/elicina/Master-Thesis/Source/Ticket-Classification/LLM-models/test.py || print_error_and_exit "Python script execution failed"
  
 #python /home/users/elicina/Master-Thesis/Source/Ticket-Classification/LLM-models/LLM-models.py || print_error_and_exit "Python script execution failed"
  

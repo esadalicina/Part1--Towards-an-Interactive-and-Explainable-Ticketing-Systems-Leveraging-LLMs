@@ -22,8 +22,6 @@ label_data = df_clean['category_encoded'].tolist()  # type: ignore
 train_texts, test_texts, train_labels, test_labels = train_test_split(ticket_data, label_data, test_size=0.3, random_state=42)
 t_texts, val_texts, t_labels, val_labels = train_test_split(train_texts, train_labels, test_size=0.2, random_state=42)
 
-
-
 # Define the maximum length for BERT input (maximum length BERT can handle is 512 tokens)
 max_length = 512
 
