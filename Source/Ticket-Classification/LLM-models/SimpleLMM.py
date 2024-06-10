@@ -26,13 +26,11 @@ predicted_labels = []
 
 # Perform classification for each sequence in the dataset
 for sequence, true_label in zip(ticket_data, label_data):
-    print("1")
     result = classifier(sequence, candidate_labels)
     predicted_label = result['labels'][0] # type: ignore
     true_labels.append(true_label)
     predicted_labels.append(predicted_label)
 
-print("6")
 # Generate and print the classification report
 report = classification_report(true_labels, predicted_labels, target_names=candidate_labels)
 print(report)

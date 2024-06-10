@@ -6,14 +6,21 @@ from transformers import BertTokenizer, BertForSequenceClassification
 from sklearn.model_selection import train_test_split
 
 # Preprocess the data
-df_clean = pd.read_csv("/home/users/elicina/Master-Thesis/Dataset/Cleaned_Dataset.csv", header=None, names=["complaint_what_happened_lemmatized", "category_encoded"])
-df = df_clean.sample(n=1000, random_state=42)
+file_path = "/home/users/elicina/Master-Thesis/Dataset/Cleaned_Dataset.csv"
+
+# Read the CSV file into a DataFrame
+df_clean = pd.read_csv(file_path)
+
+df = df_clean.sample(n=15000, random_state=42)
 
 # Initialize the tokenizer
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
 
+ticket_data = df['complaint_what_happened_lemmatized']
+label_data = df['category_encoded']
+
 # Split the dataset into training, validation, and testing sets
-t_texts, test_texts, t_labels, test_labels = train_test_split(df["complaint_what_happened_lemmatized"], df["category_encoded"], test_size=0.3, random_state=42)
+t_texts, test_texts, t_labels, test_labels = train_test_split(ticket_data, label_data, test_size=0.3, random_state=42)
 train_texts, val_texts, train_labels, val_labels = train_test_split(t_texts, t_labels, test_size=0.1, random_state=42)
 
 # Encode the data
@@ -44,6 +51,9 @@ test_encoded = tokenizer.batch_encode_plus(
     truncation=True,
     return_tensors='pt'
 )
+
+
+print(train_labels)
 
 # Prepare training, validation, and testing data
 train_input_ids = train_encoded['input_ids']
@@ -78,6 +88,8 @@ val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 test_dataset = TensorDataset(test_input_ids, test_attention_masks, test_labels)
 test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
+
+
 # Function to calculate accuracy
 def calculate_accuracy(preds, labels):
     pred_flat = torch.argmax(preds, dim=1).flatten()
@@ -86,6 +98,7 @@ def calculate_accuracy(preds, labels):
 
 # Train the model
 for epoch in range(epochs):
+
     model.train()
     total_loss = 0
     train_accuracy = 0
@@ -122,6 +135,8 @@ for epoch in range(epochs):
     print(f"Train Loss: {avg_loss:.4f}")
     print(f"Train Accuracy: {avg_train_accuracy:.4f}")
     print(f"Validation Accuracy: {avg_val_accuracy:.4f}")
+
+
 
 # Evaluate the model on the test set
 model.eval()

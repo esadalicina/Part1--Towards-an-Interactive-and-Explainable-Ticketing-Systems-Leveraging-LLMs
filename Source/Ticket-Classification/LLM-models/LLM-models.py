@@ -1,161 +1,145 @@
+# Import the necessary libraries
+import numpy as np
 import torch
 import pandas as pd
-from torch.utils.data import DataLoader, TensorDataset, RandomSampler, SequentialSampler
-from transformers import BertTokenizer, BertForSequenceClassification, AdamW
-from sklearn.model_selection import train_test_split
-import numpy as np
-from imblearn.over_sampling import SMOTE
+from transformers import BertTokenizer, BertForSequenceClassification
+from sklearn.model_selection import train_test_split, KFold
+from torch.utils.data import DataLoader, TensorDataset
 
-
-# Specify the file path of your CSV file
+# Preprocess the data
 file_path = "/home/users/elicina/Master-Thesis/Dataset/Cleaned_Dataset.csv"
 
 # Read the CSV file into a DataFrame
 df_clean = pd.read_csv(file_path)
+df = df_clean.sample(n=15000, random_state=42)
 
-
-# Extract the relevant columns for training
-ticket_data = df_clean['complaint_what_happened_lemmatized'].tolist()  # type: ignore
-label_data = df_clean['category_encoded'].tolist()  # type: ignore
-
-# Split the data into train, validation, and test sets
-train_texts, test_texts, train_labels, test_labels = train_test_split(ticket_data, label_data, test_size=0.3, random_state=42)
-t_texts, val_texts, t_labels, val_labels = train_test_split(train_texts, train_labels, test_size=0.2, random_state=42)
-
-# Define the maximum length for BERT input (maximum length BERT can handle is 512 tokens)
-max_length = 512
-
-# Preprocess the data with padding and truncation
+# Initialize the tokenizer
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
 
-def encode_texts(texts):
-    return tokenizer.batch_encode_plus(
-        texts, 
-        add_special_tokens=True, 
-        return_attention_mask=True, 
-        padding='max_length', 
-        max_length=max_length,  # Use a fixed maximum length
-        truncation=True,
-        return_tensors='pt'
-    )
+ticket_data = df['complaint_what_happened_lemmatized']
+label_data = df['category_encoded']
 
-train_encodings = encode_texts(t_texts)
-val_encodings = encode_texts(val_texts)
-test_encodings = encode_texts(test_texts)
+# Split the dataset into training and testing sets
+train_texts, test_texts, train_labels, test_labels = train_test_split(ticket_data, label_data, test_size=0.3, random_state=42)
 
-train_labels = torch.tensor(t_labels)
-val_labels = torch.tensor(val_labels)
-test_labels = torch.tensor(test_labels)
+# Encode the training data
+train_encoded = tokenizer.batch_encode_plus(
+    train_texts.tolist(), 
+    add_special_tokens=True, 
+    return_attention_mask=True, 
+    padding='max_length', 
+    max_length=256, 
+    truncation=True,
+    return_tensors='pt'
+)
 
-# Create the DataLoaders
-train_dataset = TensorDataset(train_encodings['input_ids'], train_encodings['attention_mask'], train_labels) # type: ignore
-val_dataset = TensorDataset(val_encodings['input_ids'], val_encodings['attention_mask'], val_labels)
-test_dataset = TensorDataset(test_encodings['input_ids'], test_encodings['attention_mask'], test_labels)
+# Encode the testing data
+test_encoded = tokenizer.batch_encode_plus(
+    test_texts.tolist(), 
+    add_special_tokens=True, 
+    return_attention_mask=True, 
+    padding='max_length', 
+    max_length=256, 
+    truncation=True,
+    return_tensors='pt'
+)
 
-train_dataloader = DataLoader(train_dataset, sampler=RandomSampler(train_dataset), batch_size=16)
-val_dataloader = DataLoader(val_dataset, sampler=SequentialSampler(val_dataset), batch_size=32)
-test_dataloader = DataLoader(test_dataset, sampler=SequentialSampler(test_dataset), batch_size=32)
+train_input_ids = train_encoded['input_ids']
+train_attention_masks = train_encoded['attention_mask']
+train_labels = torch.tensor(train_labels.astype(int).values, dtype=torch.long)
+
+test_input_ids = test_encoded['input_ids']
+test_attention_masks = test_encoded['attention_mask']
+test_labels = torch.tensor(test_labels.astype(int).values, dtype=torch.long)
+
+# Define KFold cross-validation
+kf = KFold(n_splits=5, shuffle=True, random_state=42)
+
+# Function to calculate accuracy
+def calculate_accuracy(preds, labels):
+    pred_flat = torch.argmax(preds, dim=1).flatten()
+    labels_flat = labels.flatten()
+    return torch.sum(pred_flat == labels_flat) / len(labels_flat)
 
 # Load the pre-trained BERT model
 model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=5, output_attentions=False, output_hidden_states=False)
 
-# Define the optimizer
-optimizer = AdamW(model.parameters(), lr=1e-5, weight_decay=0.01)
-
-# Train the model with early stopping
+# Define the training parameters
+batch_size = 32
 epochs = 3
-early_stopping_patience = 3
-best_val_loss = float('inf')
-patience_counter = 0
+optimizer = torch.optim.AdamW(model.parameters(), lr=1e-5)
 
-for epoch in range(epochs):
-    model.train()
-    total_loss = 0
-    correct_predictions = 0
-    total_predictions = 0
-    for step, batch in enumerate(train_dataloader):
-        batch_input_ids, batch_attention_masks, batch_labels = batch
-        
-        optimizer.zero_grad()  # Reset gradients
-        outputs = model(input_ids=batch_input_ids, attention_mask=batch_attention_masks, labels=batch_labels)
-        loss = outputs.loss
-        total_loss += loss.item()
-        
-        loss.backward()
-        optimizer.step()  # Update parameters
+# Cross-validation loop
+for fold, (train_index, val_index) in enumerate(kf.split(train_input_ids)):
+    print(f"Fold {fold + 1}/{kf.n_splits}") # type: ignore
 
-        predictions = torch.argmax(outputs.logits, dim=-1)
-        correct_predictions += (predictions == batch_labels).sum().item()
-        total_predictions += batch_labels.size(0)
-        
-        # if step % 10 == 0 and step > 0:
-            # print(f"  Batch {step} of {len(train_dataloader)}. Loss: {loss.item()}")
-    
-    avg_train_loss = total_loss / len(train_dataloader)
-    train_accuracy = correct_predictions / total_predictions
-    print(f"Average training loss: {avg_train_loss}")
-    print(f"Training accuracy: {train_accuracy}")
-    
-    # Validation phase
-    model.eval()
-    total_val_loss = 0
-    correct_val_predictions = 0
-    total_val_predictions = 0
-    for batch in val_dataloader:
-        batch_input_ids, batch_attention_masks, batch_labels = batch
-        
-        with torch.no_grad():
-            outputs = model(input_ids=batch_input_ids, attention_mask=batch_attention_masks, labels=batch_labels)
+    # Split data into train and validation for this fold
+    fold_train_inputs, fold_val_inputs = train_input_ids[train_index], train_input_ids[val_index]
+    fold_train_masks, fold_val_masks = train_attention_masks[train_index], train_attention_masks[val_index]
+    fold_train_labels, fold_val_labels = train_labels[train_index], train_labels[val_index]
+
+    fold_train_dataset = TensorDataset(fold_train_inputs, fold_train_masks, fold_train_labels)
+    fold_val_dataset = TensorDataset(fold_val_inputs, fold_val_masks, fold_val_labels)
+
+    fold_train_dataloader = DataLoader(fold_train_dataset, batch_size=batch_size, shuffle=True)
+    fold_val_dataloader = DataLoader(fold_val_dataset, batch_size=batch_size, shuffle=False)
+
+    for epoch in range(epochs):
+        model.train()
+        total_loss = 0
+        train_accuracy = 0
+
+        for batch in fold_train_dataloader:
+            b_input_ids, b_attention_masks, b_labels = batch
+            optimizer.zero_grad()
+            outputs = model(
+                input_ids=b_input_ids,
+                attention_mask=b_attention_masks,
+                labels=b_labels
+            )
             loss = outputs.loss
-            total_val_loss += loss.item()
-            
-            predictions = torch.argmax(outputs.logits, dim=-1)
-            correct_val_predictions += (predictions == batch_labels).sum().item()
-            total_val_predictions += batch_labels.size(0)
-    
-    avg_val_loss = total_val_loss / len(val_dataloader)
-    val_accuracy = correct_val_predictions / total_val_predictions
-    print(f"Average validation loss: {avg_val_loss}")
-    print(f"Validation accuracy: {val_accuracy}")
-    
-    # Early stopping
-    if avg_val_loss < best_val_loss:
-        best_val_loss = avg_val_loss
-        patience_counter = 0
-        torch.save(model.state_dict(), 'best_model.pt')
-    else:
-        patience_counter += 1
-        if patience_counter >= early_stopping_patience:
-            print("Early stopping triggered.")
-            break
+            total_loss += loss.item()
+            train_accuracy += calculate_accuracy(outputs.logits, b_labels).item()
+            loss.backward()
+            optimizer.step()
 
-# Load the best model for testing
-model.load_state_dict(torch.load('best_model.pt'))
+        avg_loss = total_loss / len(fold_train_dataloader)
+        avg_train_accuracy = train_accuracy / len(fold_train_dataloader)
 
-# Test the model
+        # Evaluate the model on the validation set
+        model.eval()
+        val_accuracy = 0
+        with torch.no_grad():
+            for batch in fold_val_dataloader:
+                b_input_ids, b_attention_masks, b_labels = batch
+                outputs = model(
+                    input_ids=b_input_ids,
+                    attention_mask=b_attention_masks
+                )
+                val_accuracy += calculate_accuracy(outputs.logits, b_labels).item()
+
+        avg_val_accuracy = val_accuracy / len(fold_val_dataloader)
+
+        print(f"Epoch {epoch + 1}/{epochs}")
+        print(f"Train Loss: {avg_loss:.4f}")
+        print(f"Train Accuracy: {avg_train_accuracy:.4f}")
+        print(f"Validation Accuracy: {avg_val_accuracy:.4f}")
+
+# Prepare the test dataset and dataloader
+test_dataset = TensorDataset(test_input_ids, test_attention_masks, test_labels)
+test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+
+# Evaluate the model on the test set
 model.eval()
-correct_test_predictions = 0
-total_test_predictions = 0
+test_accuracy = 0
 with torch.no_grad():
-    all_predictions = []
     for batch in test_dataloader:
-        batch_input_ids, batch_attention_masks, batch_labels = batch
-        
-        outputs = model(input_ids=batch_input_ids, attention_mask=batch_attention_masks)
-        predictions = torch.argmax(outputs.logits, dim=-1).flatten()
-        correct_test_predictions += (predictions == batch_labels).sum().item()
-        total_test_predictions += batch_labels.size(0)
-        all_predictions.extend(predictions.cpu().numpy())
-    
-    test_accuracy = correct_test_predictions / total_test_predictions
-    print("Test Accuracy:", test_accuracy)
+        b_input_ids, b_attention_masks, b_labels = batch
+        outputs = model(
+            input_ids=b_input_ids,
+            attention_mask=b_attention_masks
+        )
+        test_accuracy += calculate_accuracy(outputs.logits, b_labels).item()
 
-
-
-# Save the trained model
-# model.save_pretrained("/path/to/save/your/model")
-# tokenizer.save_pretrained("/path/to/save/your/model")
-
-# Load the model for inference
-# model = BertForSequenceClassification.from_pretrained("/path/to/save/your/model")
-# tokenizer = BertTokenizer.from_pretrained("/path/to/save/your/model")
+avg_test_accuracy = test_accuracy / len(test_dataloader)
+print("Test Accuracy:", avg_test_accuracy)

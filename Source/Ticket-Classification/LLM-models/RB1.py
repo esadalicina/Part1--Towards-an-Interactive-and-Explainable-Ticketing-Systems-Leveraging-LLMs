@@ -31,34 +31,27 @@ roberta_model = RobertaForSequenceClassification.from_pretrained('roberta-base',
 
 
 # Tokenize and encode text data
-def tokenize_data(tokenizer, texts, max_length):
-    input_ids = []
-    attention_masks = []
-    for text in texts:
-        encoded_dict = tokenizer.encode_plus(
-            text,
-            add_special_tokens=True,
-            max_length=max_length,
-            padding='max_length',
-            return_attention_mask=True,
-            return_tensors='pt',
-            truncation=True
-        )
-        input_ids.append(encoded_dict['input_ids'])
-        attention_masks.append(encoded_dict['attention_mask'])
-    input_ids = torch.cat(input_ids, dim=0)
-    attention_masks = torch.cat(attention_masks, dim=0)
-    return input_ids, attention_masks
+def tokenize_data(tokenizer, texts):
+    encoded = tokenizer.batch_encode_plus(
+        texts.tolist(), 
+        add_special_tokens=True, 
+        return_attention_mask=True, 
+        padding='max_length', 
+        max_length=256, 
+        truncation=True,
+        return_tensors='pt'
+    )
+    return encoded
 
 # Train and evaluate RoBERTa and BERT models
 def train_and_evaluate_model(model, tokenizer,train_texts, train_labels, test_texts, test_labels):
 
     # Tokenize and encode training data
-    train_input_ids, train_attention_masks = tokenize_data(tokenizer, train_texts, max_length=300)
+    train_input_ids, train_attention_masks = tokenize_data(tokenizer, train_texts)
     train_labels_tensor = torch.tensor(train_labels.values, dtype=torch.long)
 
     # Tokenize and encode test data
-    test_input_ids, test_attention_masks = tokenize_data(tokenizer, test_texts, max_length=300)
+    test_input_ids, test_attention_masks = tokenize_data(tokenizer, test_texts)
     test_labels_tensor = torch.tensor(test_labels.values, dtype=torch.long)
 
     # Create DataLoader for training and testing data
