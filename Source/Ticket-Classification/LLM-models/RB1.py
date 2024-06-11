@@ -10,7 +10,9 @@ from imblearn.over_sampling import SMOTE
 file_path = "/home/users/elicina/Master-Thesis/Dataset/Cleaned_Dataset.csv"
 
 # Read the CSV file into a DataFrame
-df_clean = pd.read_csv(file_path)
+df = pd.read_csv(file_path)
+
+df_clean = df.sample(n=1000, random_state=42)
 
 # Keep the columns "complaint_what_happened" & "category_encoded" only in the new dataframe --> training_data
 ticket_data = df_clean['complaint_what_happened_lemmatized']

@@ -2,8 +2,8 @@
 #SBATCH --job-name=Simple-LLM
 #SBATCH --partition=gpu
 #SBATCH --qos=normal
-#SBATCH -c 8
-#SBATCH -t 120
+#SBATCH -c 16
+#SBATCH -t 180
 #SBATCH -N 1
 #SBATCH --export=ALL
 
@@ -19,7 +19,7 @@ source /home/users/elicina/.virtualenvs/Master-Thesis/bin/activate || print_erro
  
 # Run your Python script
 # python /home/users/elicina/Master-Thesis/Source/Ticket-Classification/RB.py || print_error_and_exit "Python script execution failed"
-python /home/users/elicina/Master-Thesis/Source/Ticket-Classification/LLM-models/test.py || print_error_and_exit "Python script execution failed"
+# python /home/users/elicina/Master-Thesis/Source/Ticket-Classification/LLM-models/test.py || print_error_and_exit "Python script execution failed"
  
-#python /home/users/elicina/Master-Thesis/Source/Ticket-Classification/LLM-models/LLM-models.py || print_error_and_exit "Python script execution failed"
+python /home/users/elicina/Master-Thesis/Source/Ticket-Classification/LLM-models/LLM-models.py || print_error_and_exit "Python script execution failed"
  
