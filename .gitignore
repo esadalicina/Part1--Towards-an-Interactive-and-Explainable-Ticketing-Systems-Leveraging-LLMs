@@ -1,2 +1,8 @@
 Miniconda3-latest-Linux-x86_64.sh
-slurm-3495039.out
+# Ignore all .out files
+*.out
+
+# Other patterns to ignore
+node_modules/
+*.log
+.DS_Store
