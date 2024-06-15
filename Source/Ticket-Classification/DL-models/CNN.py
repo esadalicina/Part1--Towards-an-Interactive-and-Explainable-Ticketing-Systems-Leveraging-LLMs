@@ -1,9 +1,11 @@
 from sklearn.model_selection import train_test_split
 import numpy as np
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv1D, GlobalMaxPooling1D, Dense, Dropout, BatchNormalization, MaxPooling1D, Flatten
+from tensorflow.keras.layers import Conv1D, GlobalMaxPooling1D, Dense, Dropout, BatchNormalization, MaxPooling1D
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
-
+# Now you can import the module
+import Tokenization 
+from Tokenization import *
 import sys
 import os
 
@@ -12,11 +14,6 @@ other_directory_path = os.path.abspath('/home/users/elicina/Master-Thesis/Source
 
 # Add the directory to sys.path
 sys.path.append(other_directory_path)
-
-# Now you can import the module
-import Tokenization 
-from Tokenization import *
-
 
 
 X_train, X_val, Y_train, Y_val = train_test_split(train_embeddings, train_labels, test_size=0.1, random_state=42, shuffle=True)
@@ -70,7 +67,7 @@ model.summary()
 
 # Define callbacks
 early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
-reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=5, min_lr=0.0001)
+reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=5, min_lr=0.0001) # type: ignore
 
 # Train the model
 model.fit(train_embeddings_resampled, train_labels_resampled_w2v, epochs=100, batch_size=32, 

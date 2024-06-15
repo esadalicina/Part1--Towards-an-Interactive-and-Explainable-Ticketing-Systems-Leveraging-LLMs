@@ -15,3 +15,9 @@ def generate_title(text, max_length=10):
 text = "Your long text goes here."
 title = generate_title(text)
 print("Generated Title:", title)
+
+# Save the model and tokenizer
+model.save_pretrained("/home/users/elicina/Master-Thesis/Models/TitleGen")
+tokenizer.save_pretrained("/home/users/elicina/Master-Thesis/Models/TokTitleGen")
+
+print("Model and tokenizer saved successfully.")

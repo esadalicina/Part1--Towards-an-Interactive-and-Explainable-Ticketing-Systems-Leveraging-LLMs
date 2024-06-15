@@ -1,4 +1,5 @@
 # Import the necessary libraries
+from matplotlib import pyplot as plt
 import numpy as np
 import torch
 import pandas as pd
@@ -10,8 +11,7 @@ from torch.utils.data import DataLoader, TensorDataset
 file_path = "/home/users/elicina/Master-Thesis/Dataset/Cleaned_Dataset.csv"
 
 # Read the CSV file into a DataFrame
-df_clean = pd.read_csv(file_path)
-df = df_clean.sample(n=15000, random_state=42)
+df = pd.read_csv(file_path)
 
 # Initialize the tokenizer
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
@@ -69,6 +69,12 @@ batch_size = 32
 epochs = 3
 optimizer = torch.optim.AdamW(model.parameters(), lr=1e-5)
 
+# Store loss values
+train_losses = []
+val_losses = []
+
+
+
 # Cross-validation loop
 for fold, (train_index, val_index) in enumerate(kf.split(train_input_ids)):
     print(f"Fold {fold + 1}/{kf.n_splits}") # type: ignore
@@ -105,20 +111,27 @@ for fold, (train_index, val_index) in enumerate(kf.split(train_input_ids)):
 
         avg_loss = total_loss / len(fold_train_dataloader)
         avg_train_accuracy = train_accuracy / len(fold_train_dataloader)
+        train_losses.append(avg_loss)
 
         # Evaluate the model on the validation set
         model.eval()
         val_accuracy = 0
+        total_val_loss = 0
         with torch.no_grad():
             for batch in fold_val_dataloader:
                 b_input_ids, b_attention_masks, b_labels = batch
                 outputs = model(
                     input_ids=b_input_ids,
-                    attention_mask=b_attention_masks
+                    attention_mask=b_attention_masks,
+                    labels=b_labels
                 )
+                val_loss = outputs.loss
+                total_val_loss += val_loss.item()
                 val_accuracy += calculate_accuracy(outputs.logits, b_labels).item()
 
         avg_val_accuracy = val_accuracy / len(fold_val_dataloader)
+        avg_val_loss = total_val_loss / len(fold_val_dataloader)
+        val_losses.append(avg_val_loss)
 
         print(f"Epoch {epoch + 1}/{epochs}")
         print(f"Train Loss: {avg_loss:.4f}")
@@ -143,3 +156,12 @@ with torch.no_grad():
 
 avg_test_accuracy = test_accuracy / len(test_dataloader)
 print("Test Accuracy:", avg_test_accuracy)
+
+plt.figure(figsize=(10,5))
+plt.plot(train_losses, label='Train Loss')
+plt.plot(val_losses, label='Validation Loss')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.legend()
+plt.title('Training and Validation Loss')
+plt.savefig()
