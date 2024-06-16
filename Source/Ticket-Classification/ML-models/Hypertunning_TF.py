@@ -175,7 +175,7 @@ for clf_name, clf in classifiers.items():
 
     # Plot the confusion matrix
     unique_classes = test_labels.unique()  # type: ignore # Get unique class labels from the test set
-    confusion_matrix_filename = os.path.join("/home/users/elicina/Master-Thesis/Source/Digrams/ML-Results/TF",f"{clf_name}.png")
+    confusion_matrix_filename = os.path.join("/home/users/elicina/Master-Thesis/Diagrams/ML-Results/TF",f"{clf_name}.png")
     plot_confusion_matrix(test_labels, test_predictions, unique_classes, confusion_matrix_filename)
 
 
@@ -185,7 +185,7 @@ for clf_name, clf in classifiers.items():
 results_df = pd.DataFrame(results)
 
 # Save the results to a CSV file
-results_df.to_csv("/home/users/elicina/Master-Thesis/Source/Digrams/ML-Results/TF/TFResults.csv", index=False)
+results_df.to_csv("/home/users/elicina/Master-Thesis/Diagrams/ML-Results/TF/TFResults.csv", index=False)
 
 # Display the results
 print(results_df)
