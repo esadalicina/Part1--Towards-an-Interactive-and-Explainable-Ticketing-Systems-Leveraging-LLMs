@@ -127,7 +127,7 @@ parameters = {
 }
 
 # Iterate over classifiers
-results = {}
+results = []
 for clf_name, clf in classifiers.items():
     print(f"Training with {clf_name}...")
     
@@ -176,13 +176,15 @@ for clf_name, clf in classifiers.items():
     report = classification_report(test_labels, test_predictions)
 
     # Store the results
-    results[clf_name] = {
-        'accuracy': accuracy,
-        'precision': precision,
-        'recall': recall,
-        'f1': f1,
-        'report': report
-    }
+    results.append({
+        'Classifier': clf_name,
+        'Best Score': best_score,
+        'Best Parameters': best_params,
+        'Accuracy': accuracy,
+        'Precision': precision,
+        'Recall': recall,
+        'F1 Score': f1,
+    })
 
     # Print the evaluation metrics
     print(f"Results for {clf_name}:")
@@ -193,11 +195,20 @@ for clf_name, clf in classifiers.items():
     print(f'Classification Report:\n{report}\n')
 
     # Plot the confusion matrix
-    # unique_classes = test_labels.unique()  # type: ignore # Get unique class labels from the test set
-    # confusion_matrix_filename = os.path.join("/home/users/elicina/Master-Thesis/Source/Digrams/ML-Results/W2V",f"{clf_name}.png")
-    # plot_confusion_matrix(test_labels, test_predictions, unique_classes, confusion_matrix_filename)
+    unique_classes = test_labels.unique()  # type: ignore # Get unique class labels from the test set
+    confusion_matrix_filename = os.path.join("/home/users/elicina/Master-Thesis/Source/Digrams/ML-Results/W2V",f"{clf_name}.png")
+    plot_confusion_matrix(test_labels, test_predictions, unique_classes, confusion_matrix_filename)
 
 
+    
+# Create a DataFrame for the results
+results_df = pd.DataFrame(results)
+
+# Save the results to a CSV file
+results_df.to_csv("/home/users/elicina/Master-Thesis/Source/Digrams/ML-Results/W2V/W2VResults.csv", index=False)
+
+# Display the results
+print(results_df)
 
 
 

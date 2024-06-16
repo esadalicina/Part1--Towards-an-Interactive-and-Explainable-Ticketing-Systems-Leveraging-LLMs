@@ -5,7 +5,7 @@ model_name = "gpt2-medium"
 model = GPT2LMHeadModel.from_pretrained(model_name)
 tokenizer = GPT2Tokenizer.from_pretrained(model_name)
 
-def generate_title(text, max_length=10):
+def generate_title(text, max_length=7):
     prompt = f"Generate a short title for the following text: {text}"
     inputs = tokenizer.encode(prompt, return_tensors="pt")
     outputs = model.generate(inputs, max_length=max_length, num_return_sequences=1)

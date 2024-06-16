@@ -104,7 +104,7 @@ def create_base_pipeline(classifier):
 
 
 # Iterate over classifiers
-results = {}
+results = []
 for clf_name, clf in classifiers.items():
     print(f"Training with {clf_name}...")
     
@@ -155,13 +155,15 @@ for clf_name, clf in classifiers.items():
     report = classification_report(test_labels, test_predictions)
 
     # Store the results
-    results[clf_name] = {
-        'accuracy': accuracy,
-        'precision': precision,
-        'recall': recall,
-        'f1': f1,
-        'report': report
-    }
+    results.append({
+        'Classifier': clf_name,
+        'Best Score': best_score,
+        'Best Parameters': best_params,
+        'Accuracy': accuracy,
+        'Precision': precision,
+        'Recall': recall,
+        'F1 Score': f1,
+    })
 
     # Print the evaluation metrics
     print(f"Results for {clf_name}:")
@@ -179,7 +181,14 @@ for clf_name, clf in classifiers.items():
 
 
     
+# Create a DataFrame for the results
+results_df = pd.DataFrame(results)
 
+# Save the results to a CSV file
+results_df.to_csv("/home/users/elicina/Master-Thesis/Source/Digrams/ML-Results/TF/TFResults.csv", index=False)
+
+# Display the results
+print(results_df)
 
 
 
