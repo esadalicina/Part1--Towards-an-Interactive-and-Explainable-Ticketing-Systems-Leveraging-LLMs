@@ -24,3 +24,4 @@ python /home/users/elicina/Master-Thesis/Source/Ticket-Classification/LLM-models
  
 # python /home/users/elicina/Master-Thesis/Source/Ticket-Classification/LLM-models/LLM-models.py || print_error_and_exit "Python script execution failed"
  
+# python /home/users/elicina/Master-Thesis/Source/Ticket-Classification/LLM-models/RBRight.py || print_error_and_exit "Python script execution failed"

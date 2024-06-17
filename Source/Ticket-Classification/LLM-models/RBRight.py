@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 import torch
 import pandas as pd
-from transformers import BertTokenizer, BertForSequenceClassification
+from transformers import RobertaTokenizer, RobertaForSequenceClassification
 from sklearn.model_selection import train_test_split
 
 # Preprocess the data
@@ -13,7 +13,7 @@ file_path = "/home/users/elicina/Master-Thesis/Dataset/Cleaned_Dataset.csv"
 df = pd.read_csv(file_path)
 
 # Initialize the tokenizer
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
+tokenizer = RobertaTokenizer.from_pretrained('roberta-base', do_lower_case=True)
 
 ticket_data = df['complaint_what_happened_lemmatized']
 label_data = df['category_encoded']
@@ -68,7 +68,7 @@ test_attention_masks = test_encoded['attention_mask']
 test_labels = torch.tensor(test_labels.astype(int).values, dtype=torch.long)
 
 # Load the pre-trained BERT model
-model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=5, output_attentions=False, output_hidden_states=False)
+model = RobertaForSequenceClassification.from_pretrained('roberta-base', num_labels=5, output_attentions=False, output_hidden_states=False)
 
 # Define the training parameters
 batch_size = 128
@@ -171,4 +171,4 @@ plt.xlabel('Epochs')
 plt.ylabel('Loss')
 plt.legend()
 plt.title('Training and Validation Loss')
-plt.savefig("BPlot.png")
+plt.savefig("RBPlot.png")

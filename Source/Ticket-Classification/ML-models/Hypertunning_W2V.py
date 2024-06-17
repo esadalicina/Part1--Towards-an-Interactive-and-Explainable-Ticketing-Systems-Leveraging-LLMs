@@ -17,6 +17,8 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 from imblearn.pipeline import Pipeline as ImbPipeline
 from imblearn.over_sampling import SMOTE
+from sklearn.naive_bayes import MultinomialNB
+
 
 nltk.download('punkt')
 
@@ -38,11 +40,12 @@ train_texts, test_texts, train_labels, test_labels = train_test_split(ticket_dat
 
 # Define the Word2Vec transformer
 class Word2VecTransformer(BaseEstimator, TransformerMixin):
-    def __init__(self, vector_size=100, window=5, min_count=2, workers=4):
+    def __init__(self, vector_size=100, window=5, min_count=2, workers=4, sg=1):
         self.vector_size = vector_size
         self.window = window
         self.min_count = min_count
         self.workers = workers
+        self.sg = sg
 
     def fit(self, X, y=None):
         data = []
@@ -50,7 +53,7 @@ class Word2VecTransformer(BaseEstimator, TransformerMixin):
             for sentence in sent_tokenize(text):
                 words = [word.lower() for word in word_tokenize(sentence)]
                 data.append(words)
-        self.model = Word2Vec(sentences=data, vector_size=self.vector_size, window=self.window, min_count=self.min_count, workers=self.workers)
+        self.model = Word2Vec(sentences=data, vector_size=self.vector_size, window=self.window, min_count=self.min_count, workers=self.workers, sg = self.sg)
         return self
 
     def transform(self, X, y=None):
@@ -78,7 +81,7 @@ class ShapePrinter(BaseEstimator, TransformerMixin):
 # Define the classifiers to test
 classifiers = {
     'RandomForest': RandomForestClassifier(),
-    'LogisticRegression': LogisticRegression(max_iter=3000),
+    'LogisticRegression': LogisticRegression(max_iter=6000),
     'SVC': SVC(),
     'DT': DecisionTreeClassifier()
 }
@@ -95,33 +98,37 @@ def create_base_pipeline(classifier):
 # Define grid search parameters for different classifiers
 parameters = {
     'RandomForest': {
-        'w2v__vector_size': [100, 150, 200, 250, 300],
+        'w2v__vector_size': [50, 100, 150, 200, 250, 300],
         'w2v__window': [2, 5, 7, 10],
         'w2v__min_count': [1, 2],
+        'w2v__sg': [0, 1],
         'clf__n_estimators': [100,200,500,700],
         'clf__min_samples_leaf': [5,10,30],
         'clf__max_depth': [None, 20, 30, 40]
     },
     'LogisticRegression': {
-        'w2v__vector_size': [100, 150, 200, 250, 300],
+        'w2v__vector_size': [50, 100, 150, 200, 250, 300],
         'w2v__window': [2, 5, 7, 10],
         'w2v__min_count': [1, 2],
+        'w2v__sg': [0, 1],
         'clf__C': [0.01, 0.1, 1, 10],
         'clf__penalty': ['l1'],
         'clf__solver': ['liblinear','saga']
     },
     'SVC': {
-        'w2v__vector_size': [100, 150, 200, 250, 300],
+        'w2v__vector_size': [50, 100, 150, 200, 250, 300],
         'w2v__window': [2, 5, 7, 10],
         'w2v__min_count': [1, 2],
+        'w2v__sg': [0, 1],
         'clf__C': [0.01, 0.1, 1, 10, 100],
         'clf__kernel': ['linear', 'rbf'],
         'clf__gamma': [1, 0.1, 0.01, 0.001, 0.0001]
     },
     'DT': {
-        'w2v__vector_size': [100, 150, 200, 250, 300],
+        'w2v__vector_size': [50, 100, 150, 200, 250, 300],
         'w2v__window': [2, 5, 7, 10],
         'w2v__min_count': [1, 2],
+        'w2v__sg': [0, 1],
         'clf__max_depth': [None, 10, 20, 30]
     }
 }
