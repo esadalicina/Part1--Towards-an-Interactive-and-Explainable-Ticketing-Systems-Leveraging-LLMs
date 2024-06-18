@@ -17,7 +17,6 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 from imblearn.pipeline import Pipeline as ImbPipeline
 from imblearn.over_sampling import SMOTE
-from sklearn.naive_bayes import MultinomialNB
 
 
 nltk.download('punkt')
@@ -202,9 +201,9 @@ for clf_name, clf in classifiers.items():
     print(f'Classification Report:\n{report}\n')
 
     # Plot the confusion matrix
-    unique_classes = test_labels.unique()  # type: ignore # Get unique class labels from the test set
-    confusion_matrix_filename = os.path.join("/home/users/elicina/Master-Thesis/Diagrams/ML-Results/W2V",f"{clf_name}.png")
-    plot_confusion_matrix(test_labels, test_predictions, unique_classes, confusion_matrix_filename)
+    # unique_classes = test_labels.unique()  # type: ignore # Get unique class labels from the test set
+    # confusion_matrix_filename = os.path.join("/home/users/elicina/Master-Thesis/Diagrams/ML-Results/W2V",f"{clf_name}.png")
+    # plot_confusion_matrix(test_labels, test_predictions, unique_classes, confusion_matrix_filename)
 
 
     
@@ -212,7 +211,7 @@ for clf_name, clf in classifiers.items():
 results_df = pd.DataFrame(results)
 
 # Save the results to a CSV file
-results_df.to_csv("/home/users/elicina/Master-Thesis/Diagrams/ML-Results/W2V/W2VResults.csv", index=False)
+results_df.to_csv("/home/users/elicina/Master-Thesis/Diagrams/ML-Results/W2V/W2VResults1.csv", index=False)
 
 # Display the results
 print(results_df)

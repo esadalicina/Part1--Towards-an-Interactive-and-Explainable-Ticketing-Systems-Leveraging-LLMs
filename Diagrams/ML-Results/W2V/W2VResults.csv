@@ -1,0 +1,5 @@
+Classifier,Best Score,Best Parameters,Accuracy,Precision,Recall,F1 Score
+RandomForest,0.8025821024725422,"{'w2v__window': 5, 'w2v__vector_size': 200, 'w2v__sg': 1, 'w2v__min_count': 2, 'clf__n_estimators': 200, 'clf__min_samples_leaf': 5, 'clf__max_depth': 40}",0.8007009718018162,0.802695572943161,0.8007009718018162,0.8014140277490458
+LogisticRegression,0.7896065256610455,"{'w2v__window': 10, 'w2v__vector_size': 150, 'w2v__sg': 1, 'w2v__min_count': 2, 'clf__solver': 'saga', 'clf__penalty': 'l1', 'clf__C': 1}",0.7914608889596941,0.8110910443507756,0.7914608889596941,0.7977496937701193
+SVC,0.7934996184751318,"{'w2v__window': 10, 'w2v__vector_size': 300, 'w2v__sg': 1, 'w2v__min_count': 2, 'clf__kernel': 'linear', 'clf__gamma': 0.1, 'clf__C': 0.1}",0.7986299187509956,0.8147896147489938,0.7986299187509956,0.803649848991743
+DT,0.70452027678743,"{'w2v__window': 5, 'w2v__vector_size': 300, 'w2v__sg': 0, 'w2v__min_count': 1, 'clf__max_depth': 10}",0.6925282778397324,0.7172554949920188,0.6925282778397324,0.7009873516484787

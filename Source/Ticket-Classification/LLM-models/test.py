@@ -71,7 +71,7 @@ test_labels = torch.tensor(test_labels.astype(int).values, dtype=torch.long)
 model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=5, output_attentions=False, output_hidden_states=False)
 
 # Define the training parameters
-batch_size = 128
+batch_size = 32
 epochs = 6
 optimizer = torch.optim.AdamW(model.parameters(), lr=1e-5)
 

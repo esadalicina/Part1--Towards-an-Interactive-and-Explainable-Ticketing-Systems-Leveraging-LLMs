@@ -14,12 +14,10 @@ nltk.download('punkt')
 file_path = "/home/users/elicina/Master-Thesis/Dataset/Cleaned_Dataset.csv"
 
 # Read the CSV file into a DataFrame
-df = pd.read_csv(file_path)
-
-df_clean = df.dropna(subset=['complaint_what_happened_lemmatized'])
+df_clean = pd.read_csv(file_path)
 
 # Keep the columns "complaint_what_happened" & "category_encoded" only in the new dataframe --> training_data
-ticket_data = df_clean['complaint_what_happened_lemmatized']
+ticket_data = df_clean['complaint_what_happened_without_stopwords']
 label_data = df_clean['category_encoded']
 
 # Split the data into training and testing sets
@@ -51,6 +49,14 @@ X_train_tf_resampled, train_labels_resampled = smote.fit_resample(X_train_tf, tr
 
 # ----------------------------------------------------------------- Tokenization with Word2Vec ----------------------------------------------------------
 
+# Keep the columns "complaint_what_happened" & "category_encoded" only in the new dataframe --> training_data
+ticket_data_w2v = df_clean['complaint_what_happened']
+label_data_w2v = df_clean['category_encoded']
+
+# Split the data into training and testing sets
+train_texts_w2v, test_texts_w2v, train_labels_w2v, test_labels_w2v = train_test_split(ticket_data_w2v, label_data_w2v, test_size=0.2, random_state=42, shuffle=True)
+
+
 def Word2vec_method(train_texts):
     # Tokenize the training texts
     data = []
@@ -61,7 +67,7 @@ def Word2vec_method(train_texts):
             temp.append(j.lower())
         data.append(temp)
     # Train Word2Vec model
-    w2v_model = Word2Vec(sentences=data, vector_size=200, window=5, min_count=7, workers=4)
+    w2v_model = Word2Vec(sentences=data, vector_size=250, window=5, min_count=7, workers=4)
     return w2v_model
 
 # Function to average word vectors for each document
@@ -78,10 +84,10 @@ def get_word2vec_embeddings(texts, model):
     return np.array(embeddings)
 
 # Apply Word2Vec method and create the 'tokens' 
-w2v_model = Word2vec_method(train_texts)
+w2v_model = Word2vec_method(train_texts_w2v)
 
-train_embeddings = get_word2vec_embeddings(train_texts, w2v_model)
-test_embeddings = get_word2vec_embeddings(test_texts, w2v_model)
+train_embeddings = get_word2vec_embeddings(train_texts_w2v, w2v_model)
+test_embeddings = get_word2vec_embeddings(test_texts_w2v, w2v_model)
 
 # Handle class imbalance using SMOTE on Word2Vec embeddings
 # train_embeddings_resampled, train_labels_resampled_w2v = smote.fit_resample(train_embeddings, train_labels) # type: ignore
