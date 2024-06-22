@@ -28,8 +28,7 @@ file_path = "/home/users/elicina/Master-Thesis/Dataset/Cleaned_Dataset.csv"
 df_clean = pd.read_csv(file_path)
 
 # Extract the relevant columns
-ticket_data = df_clean['complaint_what_happened']
-# ticket_data = df_clean['complaint_what_happened_lemmatized']
+ticket_data = df_clean['complaint_what_happened_lemmatized']
 
 label_data = df_clean['category_encoded']
 
@@ -97,7 +96,7 @@ def create_base_pipeline(classifier):
 # Define grid search parameters for different classifiers
 parameters = {
     'RandomForest': {
-        'w2v__vector_size': [50, 100, 150, 200, 250, 300],
+        'w2v__vector_size': [150, 200, 250, 300, 350, 400],
         'w2v__window': [2, 5, 7, 10],
         'w2v__min_count': [1, 2],
         'w2v__sg': [0, 1],
@@ -106,7 +105,7 @@ parameters = {
         'clf__max_depth': [None, 20, 30, 40]
     },
     'LogisticRegression': {
-        'w2v__vector_size': [50, 100, 150, 200, 250, 300],
+        'w2v__vector_size': [150, 200, 250, 300, 350, 400],
         'w2v__window': [2, 5, 7, 10],
         'w2v__min_count': [1, 2],
         'w2v__sg': [0, 1],
@@ -115,7 +114,7 @@ parameters = {
         'clf__solver': ['liblinear','saga']
     },
     'SVC': {
-        'w2v__vector_size': [50, 100, 150, 200, 250, 300],
+        'w2v__vector_size': [150, 200, 250, 300, 350, 400],
         'w2v__window': [2, 5, 7, 10],
         'w2v__min_count': [1, 2],
         'w2v__sg': [0, 1],
@@ -124,7 +123,7 @@ parameters = {
         'clf__gamma': [1, 0.1, 0.01, 0.001, 0.0001]
     },
     'DT': {
-        'w2v__vector_size': [50, 100, 150, 200, 250, 300],
+        'w2v__vector_size': [150, 200, 250, 300, 350, 400],
         'w2v__window': [2, 5, 7, 10],
         'w2v__min_count': [1, 2],
         'w2v__sg': [0, 1],
@@ -208,13 +207,13 @@ for clf_name, clf in classifiers.items():
 
     
 # Create a DataFrame for the results
-results_df = pd.DataFrame(results)
+# results_df = pd.DataFrame(results)
 
 # Save the results to a CSV file
-results_df.to_csv("/home/users/elicina/Master-Thesis/Diagrams/ML-Results/W2V/W2VResults1.csv", index=False)
+# results_df.to_csv("/home/users/elicina/Master-Thesis/Diagrams/ML-Results/W2V/W2VResults1.csv", index=False)
 
 # Display the results
-print(results_df)
+# print(results_df)
 
 
 

@@ -1,4 +1,5 @@
 import os
+import joblib
 from matplotlib import pyplot as plt
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
@@ -108,6 +109,13 @@ def create_base_pipeline(classifier):
     ])
 
 
+# Initialize variables to store the best model and its score
+best_overall_model = None
+best_overall_score = 0
+best_count_vect = None
+best_tfidf_transformer = None
+
+
 
 # Iterate over classifiers
 results = []
@@ -130,6 +138,13 @@ for clf_name, clf in classifiers.items():
 
     # Retrieve the best model from RandomizedSearchCV
     best_model = gs_clf.best_estimator_
+
+    if best_score > best_overall_score:
+        best_overall_model = best_model
+        best_overall_score = best_score
+        best_count_vect = best_model.named_steps['count'] # type: ignore
+        best_tfidf_transformer = best_model.named_steps['tf']  # type: ignore
+
 
     # Create the test pipeline without SMOTE
     test_pipeline = Pipeline([
@@ -196,6 +211,9 @@ for clf_name, clf in classifiers.items():
 # Display the results
 #print(results_df)
 
-
+# Save the best overall model, TF-IDF transformer, and tokenizer
+joblib.dump(best_overall_model.named_steps['clf'], '/home/users/elicina/Master-Thesis/Models/MLmodel/modelML.pkl') # type: ignore
+joblib.dump(best_count_vect, '/home/users/elicina/Master-Thesis/Models/MLmodel/count_vect.pkl')
+joblib.dump(best_tfidf_transformer, '/home/users/elicina/Master-Thesis/Models/MLmodel/tfidf_transformer.pkl')
 
 

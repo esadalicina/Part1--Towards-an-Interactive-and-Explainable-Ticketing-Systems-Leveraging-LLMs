@@ -6,6 +6,8 @@ import pandas as pd
 from transformers import RobertaTokenizer, RobertaForSequenceClassification
 from sklearn.model_selection import train_test_split
 
+print("Roberta Model")
+
 # Preprocess the data
 file_path = "/home/users/elicina/Master-Thesis/Dataset/Cleaned_Dataset.csv"
 
@@ -15,7 +17,7 @@ df = pd.read_csv(file_path)
 # Initialize the tokenizer
 tokenizer = RobertaTokenizer.from_pretrained('roberta-base', do_lower_case=True)
 
-ticket_data = df['complaint_what_happened_lemmatized']
+ticket_data = df['complaint_what_happened']
 label_data = df['category_encoded']
 
 # Split the dataset into training, validation, and testing sets

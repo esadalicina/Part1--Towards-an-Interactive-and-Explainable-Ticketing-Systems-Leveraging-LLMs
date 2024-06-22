@@ -1,11 +1,10 @@
+from matplotlib import pyplot as plt
 from sklearn.model_selection import train_test_split
 import numpy as np
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv1D, GlobalMaxPooling1D, Dense, Dropout, BatchNormalization, MaxPooling1D
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 # Now you can import the module
-import Tokenization 
-from Tokenization import *
 import sys
 import os
 
@@ -14,6 +13,9 @@ other_directory_path = os.path.abspath('/home/users/elicina/Master-Thesis/Source
 
 # Add the directory to sys.path
 sys.path.append(other_directory_path)
+
+import Tokenization 
+from Tokenization import *
 
 
 X_train, X_val, Y_train, Y_val = train_test_split(train_embeddings, train_labels, test_size=0.1, random_state=42, shuffle=True)
@@ -37,6 +39,7 @@ model.add(MaxPooling1D(pool_size=2))
 model.add(Conv1D(filters=128, kernel_size=5, activation='relu'))
 model.add(BatchNormalization())
 model.add(MaxPooling1D(pool_size=2))
+model.add(Dropout(0.5))
 
 model.add(Conv1D(filters=128, kernel_size=5, activation='relu'))
 model.add(BatchNormalization())
@@ -70,10 +73,23 @@ early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_wei
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=5, min_lr=0.0001) # type: ignore
 
 # Train the model
-model.fit(train_embeddings_resampled, train_labels_resampled_w2v, epochs=100, batch_size=32, 
+history = model.fit(train_embeddings_resampled, train_labels_resampled_w2v, epochs=100, batch_size=64, 
           validation_data=(X_val, Y_val), callbacks=[early_stopping, reduce_lr]) 
 
 # Evaluate the model on the test data
 test_loss, test_accuracy = model.evaluate(test_embeddings, test_labels)
 print(f'Test Loss: {test_loss}')
 print(f'Test Accuracy: {test_accuracy}')
+
+
+# Plot the training and validation loss
+plt.figure(figsize=(12, 6))
+plt.plot(history.history['loss'], label='Train Loss') # type: ignore 
+plt.plot(history.history['val_loss'], label='Validation Loss') # type: ignore
+plt.title(f'Training and Validation Loss - Test Accuracy: {test_accuracy}')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.legend()
+plt.grid(True)
+plt.savefig('CNN_loss_plot.png')  # Save the plot as an image
+plt.show()

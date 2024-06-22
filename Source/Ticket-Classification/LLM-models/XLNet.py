@@ -3,10 +3,10 @@ from matplotlib import pyplot as plt
 import numpy as np
 import torch
 import pandas as pd
-from transformers import BertTokenizer, BertForSequenceClassification
+from transformers import XLNetTokenizer, XLNetModel
 from sklearn.model_selection import train_test_split
 
-print("Bert Model")
+print("XLNet Model")
 
 # Preprocess the data
 file_path = "/home/users/elicina/Master-Thesis/Dataset/Cleaned_Dataset.csv"
@@ -15,7 +15,7 @@ file_path = "/home/users/elicina/Master-Thesis/Dataset/Cleaned_Dataset.csv"
 df = pd.read_csv(file_path)
 
 # Initialize the tokenizer
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
+tokenizer = XLNetTokenizer.from_pretrained('xlnet-base-cased', do_lower_case=True)
 
 ticket_data = df['complaint_what_happened']
 label_data = df['category_encoded']
@@ -70,7 +70,7 @@ test_attention_masks = test_encoded['attention_mask']
 test_labels = torch.tensor(test_labels.astype(int).values, dtype=torch.long)
 
 # Load the pre-trained BERT model
-model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=5, output_attentions=False, output_hidden_states=False)
+model = XLNetModel.from_pretrained('xlnet-base-cased', num_labels=5, output_attentions=False, output_hidden_states=False)
 
 # Define the training parameters
 batch_size = 32
@@ -173,4 +173,4 @@ plt.xlabel('Epochs')
 plt.ylabel('Loss')
 plt.legend()
 plt.title('Training and Validation Loss')
-plt.savefig("BPlot.png")
+plt.savefig("XLNetlot.png")

@@ -1,3 +1,4 @@
+from matplotlib import pyplot as plt
 from sklearn.model_selection import train_test_split
 from Tokenization import *
 import numpy as np
@@ -45,6 +46,21 @@ early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_wei
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=5, min_lr=0.001)
 
 # Train the model
-model.fit(train_embeddings_resampled, train_labels_resampled_w2v, epochs=100, batch_size=64, 
+history = model.fit(train_embeddings_resampled, train_labels_resampled_w2v, epochs=100, batch_size=64, 
           validation_data=(X_val, Y_val), callbacks=[early_stopping, reduce_lr]) 
 
+test_loss, test_accuracy = model.evaluate(test_embeddings, test_labels)
+print(f'Test Loss: {test_loss}')
+print(f'Test Accuracy: {test_accuracy}')
+
+# Plot the training and validation loss
+plt.figure(figsize=(12, 6))
+plt.plot(history.history['loss'], label='Train Loss') # type: ignore 
+plt.plot(history.history['val_loss'], label='Validation Loss') # type: ignore
+plt.title(f'Training and Validation Loss - Test Accuracy: {test_accuracy}')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.legend()
+plt.grid(True)
+plt.savefig('RNN_loss_plot.png')  # Save the plot as an image
+plt.show()
