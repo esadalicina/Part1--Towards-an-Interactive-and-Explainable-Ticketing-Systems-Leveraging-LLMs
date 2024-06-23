@@ -9,7 +9,7 @@ from sklearn.metrics import accuracy_score, confusion_matrix, precision_score, r
 import pandas as pd
 import seaborn as sns
 import numpy as np
-from sklearn.model_selection import RandomizedSearchCV, train_test_split
+from sklearn.model_selection import GridSearchCV, train_test_split
 from gensim.models import Word2Vec
 from nltk.tokenize import sent_tokenize, word_tokenize
 import nltk
@@ -18,6 +18,8 @@ from sklearn.utils.validation import check_is_fitted
 from imblearn.pipeline import Pipeline as ImbPipeline
 from imblearn.over_sampling import SMOTE
 
+
+print("Hypertunning with W2V and Greadsearch")
 
 nltk.download('punkt')
 
@@ -140,7 +142,7 @@ for clf_name, clf in classifiers.items():
     base_pipeline = create_base_pipeline(clf)
     
     # Perform grid search
-    gs_clf = RandomizedSearchCV(base_pipeline, parameters[clf_name], n_jobs=-1, cv=5)
+    gs_clf = GridSearchCV(base_pipeline, parameters[clf_name], n_jobs=-1, cv=5)
     gs_clf.fit(train_texts, train_labels)
     
     # Output the best score and parameters
