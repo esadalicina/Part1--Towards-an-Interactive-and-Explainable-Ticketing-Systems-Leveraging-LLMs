@@ -5,7 +5,6 @@ import torch
 import pandas as pd
 from transformers import RobertaTokenizer, RobertaForSequenceClassification
 from sklearn.model_selection import train_test_split
-from imblearn.over_sampling import SMOTE
 
 
 print("Roberta Model")
@@ -55,16 +54,13 @@ test_encoded = tokenizer.batch_encode_plus(
     return_tensors='pt'
 )
 
-smote = SMOTE(random_state=42)
-train_encoded_smt, train_labels_smt = smote.fit_resample(train_encoded, train_labels) # type: ignore
-
 
 print(train_labels)
 
 # Prepare training, validation, and testing data
-train_input_ids = train_encoded_smt['input_ids']
-train_attention_masks = train_encoded_smt['attention_mask']
-train_labels = torch.tensor(train_labels_smt.astype(int).values, dtype=torch.long)
+train_input_ids = train_encoded['input_ids']
+train_attention_masks = train_encoded['attention_mask']
+train_labels = torch.tensor(train_labels.astype(int).values, dtype=torch.long)
 
 val_input_ids = val_encoded['input_ids']
 val_attention_masks = val_encoded['attention_mask']
@@ -80,7 +76,7 @@ model = RobertaForSequenceClassification.from_pretrained('roberta-base', num_lab
 # Define the training parameters
 batch_size = 32
 epochs = 6
-optimizer = torch.optim.AdamW(model.parameters(), lr=1e-5)
+optimizer = torch.optim.AdamW(model.parameters(), lr=2e-5)
 
 # Create DataLoader for batch processing
 from torch.utils.data import DataLoader, TensorDataset

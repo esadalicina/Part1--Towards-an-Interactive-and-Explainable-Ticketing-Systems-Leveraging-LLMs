@@ -196,21 +196,21 @@ for clf_name, clf in classifiers.items():
     print(f'Classification Report:\n{report}\n')
 
     # Plot the confusion matrix
-    unique_classes = test_labels.unique()  # type: ignore # Get unique class labels from the test set
-    confusion_matrix_filename = os.path.join("/home/users/elicina/Master-Thesis/Diagrams/ML-Results/TF",f"{clf_name}.png")
-    plot_confusion_matrix(test_labels, test_predictions, unique_classes, confusion_matrix_filename)
+    # unique_classes = test_labels.unique()  # type: ignore # Get unique class labels from the test set
+    # confusion_matrix_filename = os.path.join("/home/users/elicina/Master-Thesis/Diagrams/ML-Results/TF",f"{clf_name}.png")
+    # plot_confusion_matrix(test_labels, test_predictions, unique_classes, confusion_matrix_filename)
 
 
 
     
 # Create a DataFrame for the results
-results_df = pd.DataFrame(results)
+# results_df = pd.DataFrame(results)
 
 # Save the results to a CSV file
-results_df.to_csv("/home/users/elicina/Master-Thesis/Diagrams/ML-Results/TF/TFResults.csv", index=False)
+# results_df.to_csv("/home/users/elicina/Master-Thesis/Diagrams/ML-Results/TF/TFResults.csv", index=False)
 
 # Display the results
-print(results_df)
+# print(results_df)
 
 # Save the best overall model, TF-IDF transformer, and tokenizer
 joblib.dump(best_overall_model.named_steps['clf'], '/home/users/elicina/Master-Thesis/Models/MLmodel/TF/modelML.pkl') # type: ignore
