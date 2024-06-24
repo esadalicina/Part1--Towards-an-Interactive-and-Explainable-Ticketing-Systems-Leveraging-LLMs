@@ -14,6 +14,28 @@ LLM-based ticketing system
 - 0 [elicina@access2 ~]$ si (enter Node for exucation of code)
 - 0 [elicina@access2 ]$ exit (Get out of cluster)
 
+
+Connect with HPC in VSC:
+- Host Connection
+- Iris-host
+
+
+Submit job:
+- create .sh file 
+- run sbatch file path
+
+Submit real time jon:
+- si-gpu -G 1 -c 8 -t 120
+
+
+Activate env:
+- conda activate myenv
+- source /home/users/elicina/.virtualenvs/Master-Thesis/bin/activate
+
+Creating requirements file:
+- pip freeze > requirements.txt
+
+
 PYTHON Tutorial: https://github.com/ULHPC/tutorials/tree/devel/python/basics
 
 
