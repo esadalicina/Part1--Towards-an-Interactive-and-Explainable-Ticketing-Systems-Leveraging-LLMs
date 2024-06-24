@@ -8,6 +8,9 @@ from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 import sys
 import os
 
+print("HNN model")
+
+
 # Get the absolute path of the directory containing other_script.py
 other_directory_path = os.path.abspath('/home/users/elicina/Master-Thesis/Source/Ticket-Classification')
 

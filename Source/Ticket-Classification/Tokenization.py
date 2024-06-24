@@ -50,7 +50,7 @@ X_train_tf_resampled, train_labels_resampled = smote.fit_resample(X_train_tf, tr
 # ----------------------------------------------------------------- Tokenization with Word2Vec ----------------------------------------------------------
 
 # Keep the columns "complaint_what_happened" & "category_encoded" only in the new dataframe --> training_data
-ticket_data_w2v = df_clean['complaint_what_happened']
+ticket_data_w2v = df_clean['complaint_what_happened_basic_clean_DL']
 label_data_w2v = df_clean['category_encoded']
 
 # Split the data into training and testing sets

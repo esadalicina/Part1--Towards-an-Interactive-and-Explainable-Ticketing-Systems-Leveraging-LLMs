@@ -18,7 +18,7 @@ df = pd.read_csv(file_path)
 # Initialize the tokenizer
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
 
-ticket_data = df['complaint_what_happened']
+ticket_data = df['complaint_what_happened_basic_clean_LMM']
 label_data = df['category_encoded']
 
 # Split the dataset into training, validation, and testing sets

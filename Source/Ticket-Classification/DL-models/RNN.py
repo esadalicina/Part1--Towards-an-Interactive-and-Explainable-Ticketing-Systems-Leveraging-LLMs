@@ -6,6 +6,8 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv1D, SpatialDropout1D, Dense, Dropout, Bidirectional, LSTM
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 
+print("RNN model")
+
 
 X_train, X_val, Y_train, Y_val = train_test_split(train_embeddings, train_labels, test_size=0.2, random_state=42, shuffle=True)
 
