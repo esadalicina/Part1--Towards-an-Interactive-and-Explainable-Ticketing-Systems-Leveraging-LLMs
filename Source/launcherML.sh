@@ -3,8 +3,8 @@
 #SBATCH --partition=gpu
 #SBATCH --qos=normal
 #SBATCH -G 2
-#SBATCH -c 8
-#SBATCH -t 120
+#SBATCH -c 12
+#SBATCH -t 180
 #SBATCH -N 1                  
 #SBATCH --export=ALL
 
