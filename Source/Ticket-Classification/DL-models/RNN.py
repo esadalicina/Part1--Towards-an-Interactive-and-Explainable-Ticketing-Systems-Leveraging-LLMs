@@ -1,6 +1,5 @@
 from matplotlib import pyplot as plt
 from sklearn.model_selection import train_test_split
-from Tokenization import *
 import numpy as np
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv1D, SpatialDropout1D, Dense, Dropout, Bidirectional, LSTM
@@ -8,6 +7,19 @@ from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 
 print("RNN model")
 
+
+import sys
+import os
+
+# Get the absolute path of the directory containing other_script.py
+other_directory_path = os.path.abspath('/home/users/elicina/Master-Thesis/Source/Ticket-Classification')
+
+# Add the directory to sys.path
+sys.path.append(other_directory_path)
+
+# Now you can import the module
+import Tokenization 
+from Tokenization import *
 
 X_train, X_val, Y_train, Y_val = train_test_split(train_embeddings, train_labels, test_size=0.2, random_state=42, shuffle=True)
 
@@ -48,7 +60,7 @@ early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_wei
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=5, min_lr=0.001)
 
 # Train the model
-history = model.fit(train_embeddings_resampled, train_labels_resampled_w2v, epochs=100, batch_size=64, 
+history = model.fit(train_embeddings_resampled, train_labels_resampled_w2v, epochs=50, batch_size=64, 
           validation_data=(X_val, Y_val), callbacks=[early_stopping, reduce_lr]) 
 
 test_loss, test_accuracy = model.evaluate(test_embeddings, test_labels)

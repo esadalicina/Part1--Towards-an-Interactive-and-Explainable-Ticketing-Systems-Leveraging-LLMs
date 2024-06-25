@@ -2,9 +2,9 @@
 #SBATCH --job-name=Simple-LLM
 #SBATCH --partition=gpu
 #SBATCH --qos=normal
-#SBATCH -G 2
-#SBATCH -c 12
-#SBATCH -t 180
+#SBATCH -G 3
+#SBATCH -c 14
+#SBATCH -t 240
 #SBATCH -N 1                  
 #SBATCH --export=ALL
 

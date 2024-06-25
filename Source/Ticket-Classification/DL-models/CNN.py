@@ -45,17 +45,6 @@ model.add(Dropout(0.5))
 
 model.add(Conv1D(filters=128, kernel_size=5, activation='relu'))
 model.add(BatchNormalization())
-model.add(MaxPooling1D(pool_size=2))
-model.add(Dropout(0.5))
-
-model.add(Conv1D(filters=128, kernel_size=5, activation='relu'))
-model.add(BatchNormalization())
-model.add(MaxPooling1D(pool_size=2))
-model.add(Dropout(0.5))
-
-
-model.add(Conv1D(filters=128, kernel_size=5, activation='relu'))
-model.add(BatchNormalization())
 model.add(GlobalMaxPooling1D())
 
 # Fully connected layer
@@ -75,7 +64,7 @@ early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_wei
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=5, min_lr=0.0001) # type: ignore
 
 # Train the model
-history = model.fit(train_embeddings_resampled, train_labels_resampled_w2v, epochs=100, batch_size=64, 
+history = model.fit(train_embeddings_resampled, train_labels_resampled_w2v, epochs=50, batch_size=128, 
           validation_data=(X_val, Y_val), callbacks=[early_stopping, reduce_lr]) 
 
 # Evaluate the model on the test data

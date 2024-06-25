@@ -7,3 +7,4 @@ node_modules/
 *.log
 .DS_Store
 Models/
+Source/Ticket-Classification/__pycache__/Tokenization.cpython-36.pyc

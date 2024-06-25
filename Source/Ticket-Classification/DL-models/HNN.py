@@ -52,6 +52,7 @@ model.add(Dropout(rate=0.5))
 
 # Output layer
 model.add(Dense(5, activation='softmax'))
+model.add(Dropout(rate=0.5))
 
 # Compile the model with sparse_categorical_crossentropy
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
@@ -64,7 +65,7 @@ early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_wei
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=5, min_lr=0.0001)
 
 # Train the model
-history = model.fit(train_embeddings_resampled, train_labels_resampled_w2v, epochs=100, batch_size=32, 
+history = model.fit(train_embeddings_resampled, train_labels_resampled_w2v, epochs=50, batch_size=64, 
           validation_data=(X_val, Y_val), callbacks=[early_stopping, reduce_lr]) 
 
 
