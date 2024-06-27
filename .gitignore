@@ -8,3 +8,4 @@ node_modules/
 .DS_Store
 Models/
 Source/Ticket-Classification/__pycache__/Tokenization.cpython-36.pyc
+best_model.h5

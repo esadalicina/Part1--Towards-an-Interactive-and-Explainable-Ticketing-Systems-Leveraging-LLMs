@@ -3,8 +3,12 @@ from matplotlib import pyplot as plt
 import numpy as np
 import torch
 import pandas as pd
-from transformers import RobertaTokenizer, RobertaForSequenceClassification
+from transformers import RobertaTokenizer, RobertaForSequenceClassification, get_linear_schedule_with_warmup
 from sklearn.model_selection import train_test_split
+from torch.nn.utils import clip_grad_norm_
+from torch.utils.data import DataLoader, TensorDataset, RandomSampler, SequentialSampler
+from sklearn.feature_extraction.text import TfidfVectorizer
+from imblearn.over_sampling import SMOTE
 
 
 print("Roberta Model")
@@ -21,9 +25,24 @@ tokenizer = RobertaTokenizer.from_pretrained('roberta-base', do_lower_case=True)
 ticket_data = df['complaint_what_happened_basic_clean_LMM']
 label_data = df['category_encoded']
 
-# Split the dataset into training, validation, and testing sets
+
+# Split data
 t_texts, test_texts, t_labels, test_labels = train_test_split(ticket_data, label_data, test_size=0.3, random_state=42, shuffle=True)
 train_texts, val_texts, train_labels, val_labels = train_test_split(t_texts, t_labels, test_size=0.1, random_state=42, shuffle=True)
+
+# Convert text data to TF-IDF features
+vectorizer = TfidfVectorizer(max_features=5000)
+train_tfidf = vectorizer.fit_transform(train_texts)
+
+# Apply SMOTE to oversample the minority classes
+smote = SMOTE(random_state=42)
+train_tfidf_resampled, train_labels_resampled = smote.fit_resample(train_tfidf, train_labels)
+
+# Convert TF-IDF matrix back to text for tokenization
+train_texts_resampled = vectorizer.inverse_transform(train_tfidf_resampled)
+train_texts_resampled = [" ".join(text) for text in train_texts_resampled] # type: ignore
+
+
 
 # Encode the data
 train_encoded = tokenizer.batch_encode_plus(
@@ -55,12 +74,12 @@ test_encoded = tokenizer.batch_encode_plus(
 )
 
 
-print(train_labels)
+print(train_labels_resampled)
 
 # Prepare training, validation, and testing data
 train_input_ids = train_encoded['input_ids']
 train_attention_masks = train_encoded['attention_mask']
-train_labels = torch.tensor(train_labels.astype(int).values, dtype=torch.long)
+train_labels = torch.tensor(train_labels_resampled.astype(int).values, dtype=torch.long)
 
 val_input_ids = val_encoded['input_ids']
 val_attention_masks = val_encoded['attention_mask']
@@ -81,14 +100,18 @@ optimizer = torch.optim.AdamW(model.parameters(), lr=2e-5)
 # Create DataLoader for batch processing
 from torch.utils.data import DataLoader, TensorDataset
 
+# Create DataLoader for batch processing
 train_dataset = TensorDataset(train_input_ids, train_attention_masks, train_labels)
-train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+train_dataloader = DataLoader(train_dataset, sampler=RandomSampler(train_dataset), batch_size=batch_size)
 
 val_dataset = TensorDataset(val_input_ids, val_attention_masks, val_labels)
-val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+val_dataloader = DataLoader(val_dataset, sampler=SequentialSampler(val_dataset), batch_size=batch_size)
 
 test_dataset = TensorDataset(test_input_ids, test_attention_masks, test_labels)
-test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+test_dataloader = DataLoader(test_dataset, sampler=SequentialSampler(test_dataset), batch_size=batch_size)
+
+total_steps = len(train_dataloader) * epochs
+scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=0, num_training_steps=total_steps)
 
 train_losses = []
 val_losses = []
@@ -117,7 +140,9 @@ for epoch in range(epochs):
         total_loss += loss.item()
         train_accuracy += calculate_accuracy(outputs.logits, b_labels).item()
         loss.backward()
+        clip_grad_norm_(model.parameters(), 1.0)
         optimizer.step()
+        scheduler.step() # type: ignore
     avg_loss = total_loss / len(train_dataloader)
     avg_train_accuracy = train_accuracy / len(train_dataloader)
     train_losses.append(avg_loss)
