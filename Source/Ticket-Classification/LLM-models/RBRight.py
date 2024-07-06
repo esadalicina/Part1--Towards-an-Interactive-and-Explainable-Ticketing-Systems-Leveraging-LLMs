@@ -5,7 +5,6 @@ import torch
 import pandas as pd
 from transformers import RobertaTokenizer, RobertaForSequenceClassification, get_linear_schedule_with_warmup
 from sklearn.model_selection import train_test_split
-from torch.nn.utils import clip_grad_norm_
 from torch.utils.data import DataLoader, TensorDataset, RandomSampler, SequentialSampler
 from sklearn.feature_extraction.text import TfidfVectorizer
 from imblearn.over_sampling import SMOTE
@@ -17,7 +16,10 @@ print("Roberta Model")
 file_path = "/home/users/elicina/Master-Thesis/Dataset/Cleaned_Dataset.csv"
 
 # Read the CSV file into a DataFrame
-df = pd.read_csv(file_path)
+df_df = pd.read_csv(file_path)
+
+# Take a small sample of the data, e.g., 5 rows
+df = df_df.sample(n=15000)
 
 # Initialize the tokenizer
 tokenizer = RobertaTokenizer.from_pretrained('roberta-base', do_lower_case=True)
@@ -46,7 +48,7 @@ train_texts_resampled = [" ".join(text) for text in train_texts_resampled] # typ
 
 # Encode the data
 train_encoded = tokenizer.batch_encode_plus(
-    train_texts.tolist(), 
+    train_texts_resampled, 
     add_special_tokens=True, 
     return_attention_mask=True, 
     padding='max_length', 
@@ -140,9 +142,8 @@ for epoch in range(epochs):
         total_loss += loss.item()
         train_accuracy += calculate_accuracy(outputs.logits, b_labels).item()
         loss.backward()
-        clip_grad_norm_(model.parameters(), 1.0)
         optimizer.step()
-        scheduler.step() # type: ignore
+        scheduler.step()
     avg_loss = total_loss / len(train_dataloader)
     avg_train_accuracy = train_accuracy / len(train_dataloader)
     train_losses.append(avg_loss)

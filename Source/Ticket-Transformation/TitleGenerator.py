@@ -1,23 +1,17 @@
-from transformers import GPT2LMHeadModel, GPT2Tokenizer
 
-# Load a pre-trained GPT-2 model and tokenizer
-model_name = "gpt2-medium"
-model = GPT2LMHeadModel.from_pretrained(model_name)
-tokenizer = GPT2Tokenizer.from_pretrained(model_name)
+input_text = "I am having trouble logging into my bank account. I have tried multiple times and I have received no response. " \
+       "I tried resetting my password, but that did not seem to work either. " \
+       "I am concerned that there may be an issue with my account security or " \
+       "that someone has accessed my account without my permission."
 
-def generate_title(text, max_length=7):
-    prompt = f"Generate a short title for the following text: {text}"
-    inputs = tokenizer.encode(prompt, return_tensors="pt")
-    outputs = model.generate(inputs, max_length=max_length, num_return_sequences=1)
-    title = tokenizer.decode(outputs[0], skip_special_tokens=True)
-    return title
+from transformers import AutoTokenizer, T5ForConditionalGeneration
 
-text = "Your long text goes here."
-title = generate_title(text)
-print("Generated Title:", title)
+tokenizer = AutoTokenizer.from_pretrained("czearing/article-title-generator")
+model = T5ForConditionalGeneration.from_pretrained("czearing/article-title-generator")
 
-# Save the model and tokenizer
-model.save_pretrained("/home/users/elicina/Master-Thesis/Models/TitleGen")
-tokenizer.save_pretrained("/home/users/elicina/Master-Thesis/Models/TokTitleGen")
+input_ids = tokenizer(input_text, return_tensors="pt").input_ids
 
-print("Model and tokenizer saved successfully.")
+outputs = model.generate(input_ids)
+summary = tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+print(summary)

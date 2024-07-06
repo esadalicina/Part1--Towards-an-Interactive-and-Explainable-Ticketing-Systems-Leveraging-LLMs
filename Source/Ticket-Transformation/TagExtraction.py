@@ -27,14 +27,14 @@ while True:
 
     # Extract tags from the ticket text
     tags = extract_tags(ticket_text)
-    unique_tags.update(tags)  # Add the tags to the set of unique tags
+    #unique_tags.update(tags)  # Add the tags to the set of unique tags
 
     # Convert the set of unique tags back to a list
-    unique_tags_list = list(unique_tags)
+    unique_tags_list = list(tags)
     print("Unique Tags:", unique_tags_list)
 
 # Save the model and tokenizer
-model.save_pretrained("/home/users/elicina/Master-Thesis/Models/TagGen")
-tokenizer.save_pretrained("/home/users/elicina/Master-Thesis/Models/Tok-TagGen")
+# model.save_pretrained("/home/users/elicina/Master-Thesis/Models/TagGen")
+# tokenizer.save_pretrained("/home/users/elicina/Master-Thesis/Models/Tok-TagGen")
 
-print("Model and tokenizer saved successfully.")
+# print("Model and tokenizer saved successfully.")
