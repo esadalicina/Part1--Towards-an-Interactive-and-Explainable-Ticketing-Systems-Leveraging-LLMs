@@ -16,7 +16,7 @@ other_directory_path = os.path.abspath('/home/users/elicina/Master-Thesis/Source
 # Add the directory to sys.path
 sys.path.append(other_directory_path)
 
-import Tokenization 
+#import Tokenization 
 from Tokenization import *
 
 
@@ -73,6 +73,27 @@ print(f'Test Loss: {test_loss}')
 print(f'Test Accuracy: {test_accuracy}')
 
 
+from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
+
+# Make predictions on the test set
+predictions = model.predict(test_embeddings)
+predicted_labels = np.argmax(predictions, axis=1)
+
+# Convert true labels to categorical (if needed)
+true_labels_categorical = test_labels
+
+# Calculate metrics
+precision = precision_score(true_labels_categorical, predicted_labels, average='weighted')
+recall = recall_score(true_labels_categorical, predicted_labels, average='weighted')
+f1 = f1_score(true_labels_categorical, predicted_labels, average='weighted')
+accuracy = accuracy_score(true_labels_categorical, predicted_labels)
+
+print(f'Precision: {precision:.4f}')
+print(f'Recall: {recall:.4f}')
+print(f'F1-score: {f1:.4f}')
+print(f'Accuracy: {accuracy:.4f}')
+
+
 # Plot the training and validation loss
 plt.figure(figsize=(12, 6))
 plt.plot(history.history['loss'], label='Train Loss') # type: ignore 
@@ -82,5 +103,5 @@ plt.xlabel('Epochs')
 plt.ylabel('Loss')
 plt.legend()
 plt.grid(True)
-plt.savefig('CNN_loss_plot.png')  # Save the plot as an image
+#plt.savefig('CNN_loss_plot.png')  # Save the plot as an image
 plt.show()

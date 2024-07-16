@@ -4,6 +4,7 @@ import numpy as np
 import torch
 import pandas as pd
 from transformers import BertTokenizer, BertForSequenceClassification
+from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 from sklearn.model_selection import train_test_split
 
 
@@ -151,6 +152,8 @@ for epoch in range(epochs):
     print(f"Validation Accuracy: {avg_val_accuracy:.4f}")
 
 
+predictions = []
+true_labels = []
 
 # Evaluate the model on the test set
 model.eval()
@@ -162,10 +165,27 @@ with torch.no_grad():
             input_ids=b_input_ids,
             attention_mask=b_attention_masks
         )
-        test_accuracy += calculate_accuracy(outputs.logits, b_labels).item()
-avg_test_accuracy = test_accuracy / len(test_dataloader)
+        logits = outputs.logits
+        preds = torch.argmax(logits, dim=1)
+        predictions.extend(preds.tolist())
+        true_labels.extend(b_labels.tolist())
 
-print("Test Accuracy:", avg_test_accuracy)
+# print("Test Accuracy:", avg_test_accuracy)
+
+# Convert predictions and true labels to numpy arrays
+predictions = np.array(predictions)
+true_labels = np.array(true_labels)
+
+# Calculate metrics
+precision = precision_score(true_labels, predictions, average='weighted')
+recall = recall_score(true_labels, predictions, average='weighted')
+f1 = f1_score(true_labels, predictions, average='weighted')
+accuracy = accuracy_score(true_labels, predictions)
+
+print(f'Precision: {precision:.4f}')
+print(f'Recall: {recall:.4f}')
+print(f'F1-score: {f1:.4f}')
+print(f'Accuracy: {accuracy:.4f}')
 
 
 plt.figure(figsize=(10,5))
