@@ -5,6 +5,8 @@ import torch
 import pandas as pd
 from transformers import XLNetTokenizer, XLNetForSequenceClassification
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
+import time
 
 
 print("XLNet Model")
@@ -98,6 +100,9 @@ def calculate_accuracy(preds, labels):
     labels_flat = labels.flatten()
     return torch.sum(pred_flat == labels_flat) / len(labels_flat)
 
+start_train_time = time.time()
+
+
 # Train the model
 for epoch in range(epochs):
 
@@ -150,8 +155,17 @@ for epoch in range(epochs):
     print(f"Validation Accuracy: {avg_val_accuracy:.4f}")
 
 
+end_train_time = time.time()
+training_time = end_train_time - start_train_time
+print(f'Training Time: {training_time:.2f} seconds')
 
 # Evaluate the model on the test set
+start_test_time = time.time()
+
+
+predictions = []
+true_labels = []
+
 model.eval()
 test_accuracy = 0
 with torch.no_grad():
@@ -161,10 +175,32 @@ with torch.no_grad():
             input_ids=b_input_ids,
             attention_mask=b_attention_masks
         )
-        test_accuracy += calculate_accuracy(outputs.logits, b_labels).item()
-avg_test_accuracy = test_accuracy / len(test_dataloader)
+        logits = outputs.logits
+        preds = torch.argmax(logits, dim=1)
+        predictions.extend(preds.tolist())
+        true_labels.extend(b_labels.tolist())
 
-print("Test Accuracy:", avg_test_accuracy)
+
+end_test_time = time.time()
+test_time = end_test_time - start_test_time
+print(f'Test Evaluation Time: {test_time:.2f} seconds')
+
+
+# Convert predictions and true labels to numpy arrays
+predictions = np.array(predictions)
+true_labels = np.array(true_labels)
+
+# Calculate metrics
+precision = precision_score(true_labels, predictions, average='weighted')
+recall = recall_score(true_labels, predictions, average='weighted')
+f1 = f1_score(true_labels, predictions, average='weighted')
+accuracy = accuracy_score(true_labels, predictions)
+
+print(f'Precision: {precision:.4f}')
+print(f'Recall: {recall:.4f}')
+print(f'F1-score: {f1:.4f}')
+print(f'Accuracy: {accuracy:.4f}')
+
 
 
 plt.figure(figsize=(10,5))

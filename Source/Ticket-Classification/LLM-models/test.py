@@ -6,6 +6,7 @@ import pandas as pd
 from transformers import BertTokenizer, BertForSequenceClassification
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 from sklearn.model_selection import train_test_split
+import time
 
 
 print("Bert Model")
@@ -100,6 +101,9 @@ def calculate_accuracy(preds, labels):
     labels_flat = labels.flatten()
     return torch.sum(pred_flat == labels_flat) / len(labels_flat)
 
+start_train_time = time.time()
+
+
 # Train the model
 for epoch in range(epochs):
 
@@ -152,6 +156,16 @@ for epoch in range(epochs):
     print(f"Validation Accuracy: {avg_val_accuracy:.4f}")
 
 
+
+end_train_time = time.time()
+training_time = end_train_time - start_train_time
+print(f'Training Time: {training_time:.2f} seconds')
+
+# Evaluate the model on the test set
+start_test_time = time.time()
+
+
+
 predictions = []
 true_labels = []
 
@@ -170,7 +184,10 @@ with torch.no_grad():
         predictions.extend(preds.tolist())
         true_labels.extend(b_labels.tolist())
 
-# print("Test Accuracy:", avg_test_accuracy)
+end_test_time = time.time()
+test_time = end_test_time - start_test_time
+print(f'Test Evaluation Time: {test_time:.2f} seconds')
+
 
 # Convert predictions and true labels to numpy arrays
 predictions = np.array(predictions)

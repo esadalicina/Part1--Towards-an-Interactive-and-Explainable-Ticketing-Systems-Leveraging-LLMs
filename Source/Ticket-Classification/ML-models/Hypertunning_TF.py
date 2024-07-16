@@ -1,4 +1,5 @@
 import os
+import time
 import joblib
 from matplotlib import pyplot as plt
 from sklearn.linear_model import LogisticRegression
@@ -126,9 +127,14 @@ for clf_name, clf in classifiers.items():
     # Create the base pipeline for the classifier
     base_pipeline = create_base_pipeline(clf)
     
+
+    start_train_time = time.time()
+
     # Perform grid search
     gs_clf = GridSearchCV(base_pipeline, parameters[clf_name], n_jobs=-1, cv=5) # scoring=custom_scorer
     gs_clf.fit(train_texts, train_labels)
+    end_train_time = time.time()
+
     
     # Output the best score and parameters
     best_score = gs_clf.best_score_
@@ -136,6 +142,8 @@ for clf_name, clf in classifiers.items():
     
     print(f'Best score: {best_score}')
     print(f'Best parameters: {best_params}')
+    print(f'Training Time for {clf_name}: {end_train_time - start_train_time:.2f} seconds')
+
 
     # Retrieve the best model from RandomizedSearchCV
     best_model = gs_clf.best_estimator_
@@ -155,7 +163,11 @@ for clf_name, clf in classifiers.items():
     ])
 
     # Transform the test data and make predictions
+    start_test_time = time.time()
     test_predictions = test_pipeline.predict(test_texts)
+    end_test_time = time.time()
+    print(f'Test Evaluation Time for {clf_name}: {end_test_time - start_test_time:.2f} seconds')
+
 
 
     # Function to plot confusion matrix
@@ -185,6 +197,8 @@ for clf_name, clf in classifiers.items():
         'Precision': precision,
         'Recall': recall,
         'F1 Score': f1,
+        'Training Time (s)': end_train_time - start_train_time,
+        'Test Evaluation Time (s)': end_test_time - start_test_time
     })
 
     # Print the evaluation metrics
@@ -196,21 +210,21 @@ for clf_name, clf in classifiers.items():
     print(f'Classification Report:\n{report}\n')
 
     # Plot the confusion matrix
-    # unique_classes = test_labels.unique()  # type: ignore # Get unique class labels from the test set
-    # confusion_matrix_filename = os.path.join("/home/users/elicina/Master-Thesis/Diagrams/ML-Results/TF",f"{clf_name}.png")
-    # plot_confusion_matrix(test_labels, test_predictions, unique_classes, confusion_matrix_filename)
+    unique_classes = test_labels.unique()  # type: ignore # Get unique class labels from the test set
+    confusion_matrix_filename = os.path.join("/home/users/elicina/Master-Thesis/Diagrams/ML-Results/TF",f"{clf_name}.png")
+    plot_confusion_matrix(test_labels, test_predictions, unique_classes, confusion_matrix_filename)
 
 
 
     
 # Create a DataFrame for the results
-# results_df = pd.DataFrame(results)
+results_df = pd.DataFrame(results)
 
 # Save the results to a CSV file
-# results_df.to_csv("/home/users/elicina/Master-Thesis/Diagrams/ML-Results/TF/TFResults.csv", index=False)
+results_df.to_csv("/home/users/elicina/Master-Thesis/Diagrams/ML-Results/TF/TFResults.csv", index=False)
 
 # Display the results
-# print(results_df)
+print(results_df)
 
 # Save the best overall model, TF-IDF transformer, and tokenizer
 joblib.dump(best_overall_model.named_steps['clf'], '/home/users/elicina/Master-Thesis/Models/MLmodel/TF/modelML.pkl') # type: ignore

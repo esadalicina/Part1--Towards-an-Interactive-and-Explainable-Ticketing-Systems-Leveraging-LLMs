@@ -8,6 +8,8 @@ from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, TensorDataset, RandomSampler, SequentialSampler
 from sklearn.feature_extraction.text import TfidfVectorizer
 from imblearn.over_sampling import SMOTE
+from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
+import time
 
 
 print("Roberta Model")
@@ -16,10 +18,8 @@ print("Roberta Model")
 file_path = "/home/users/elicina/Master-Thesis/Dataset/Cleaned_Dataset.csv"
 
 # Read the CSV file into a DataFrame
-df_df = pd.read_csv(file_path)
+df = pd.read_csv(file_path)
 
-# Take a small sample of the data, e.g., 5 rows
-df = df_df.sample(n=15000)
 
 # Initialize the tokenizer
 tokenizer = RobertaTokenizer.from_pretrained('roberta-base', do_lower_case=True)
@@ -32,23 +32,10 @@ label_data = df['category_encoded']
 t_texts, test_texts, t_labels, test_labels = train_test_split(ticket_data, label_data, test_size=0.3, random_state=42, shuffle=True)
 train_texts, val_texts, train_labels, val_labels = train_test_split(t_texts, t_labels, test_size=0.1, random_state=42, shuffle=True)
 
-# Convert text data to TF-IDF features
-vectorizer = TfidfVectorizer(max_features=5000)
-train_tfidf = vectorizer.fit_transform(train_texts)
-
-# Apply SMOTE to oversample the minority classes
-smote = SMOTE(random_state=42)
-train_tfidf_resampled, train_labels_resampled = smote.fit_resample(train_tfidf, train_labels)
-
-# Convert TF-IDF matrix back to text for tokenization
-train_texts_resampled = vectorizer.inverse_transform(train_tfidf_resampled)
-train_texts_resampled = [" ".join(text) for text in train_texts_resampled] # type: ignore
-
-
 
 # Encode the data
 train_encoded = tokenizer.batch_encode_plus(
-    train_texts_resampled, 
+    train_texts.tolist(),  
     add_special_tokens=True, 
     return_attention_mask=True, 
     padding='max_length', 
@@ -76,12 +63,12 @@ test_encoded = tokenizer.batch_encode_plus(
 )
 
 
-print(train_labels_resampled)
+print(train_labels)
 
 # Prepare training, validation, and testing data
 train_input_ids = train_encoded['input_ids']
 train_attention_masks = train_encoded['attention_mask']
-train_labels = torch.tensor(train_labels_resampled.astype(int).values, dtype=torch.long)
+train_labels = torch.tensor(train_labels.astype(int).values, dtype=torch.long)
 
 val_input_ids = val_encoded['input_ids']
 val_attention_masks = val_encoded['attention_mask']
@@ -112,9 +99,6 @@ val_dataloader = DataLoader(val_dataset, sampler=SequentialSampler(val_dataset),
 test_dataset = TensorDataset(test_input_ids, test_attention_masks, test_labels)
 test_dataloader = DataLoader(test_dataset, sampler=SequentialSampler(test_dataset), batch_size=batch_size)
 
-total_steps = len(train_dataloader) * epochs
-scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=0, num_training_steps=total_steps)
-
 train_losses = []
 val_losses = []
 
@@ -123,6 +107,9 @@ def calculate_accuracy(preds, labels):
     pred_flat = torch.argmax(preds, dim=1).flatten()
     labels_flat = labels.flatten()
     return torch.sum(pred_flat == labels_flat) / len(labels_flat)
+
+start_train_time = time.time()
+
 
 # Train the model
 for epoch in range(epochs):
@@ -143,7 +130,6 @@ for epoch in range(epochs):
         train_accuracy += calculate_accuracy(outputs.logits, b_labels).item()
         loss.backward()
         optimizer.step()
-        scheduler.step()
     avg_loss = total_loss / len(train_dataloader)
     avg_train_accuracy = train_accuracy / len(train_dataloader)
     train_losses.append(avg_loss)
@@ -178,7 +164,17 @@ for epoch in range(epochs):
 
 
 
+end_train_time = time.time()
+training_time = end_train_time - start_train_time
+print(f'Training Time: {training_time:.2f} seconds')
+
 # Evaluate the model on the test set
+start_test_time = time.time()
+
+
+predictions = []
+true_labels = []
+
 model.eval()
 test_accuracy = 0
 with torch.no_grad():
@@ -188,10 +184,32 @@ with torch.no_grad():
             input_ids=b_input_ids,
             attention_mask=b_attention_masks
         )
-        test_accuracy += calculate_accuracy(outputs.logits, b_labels).item()
-avg_test_accuracy = test_accuracy / len(test_dataloader)
+        logits = outputs.logits
+        preds = torch.argmax(logits, dim=1)
+        predictions.extend(preds.tolist())
+        true_labels.extend(b_labels.tolist())
 
-print("Test Accuracy:", avg_test_accuracy)
+
+end_test_time = time.time()
+test_time = end_test_time - start_test_time
+print(f'Test Evaluation Time: {test_time:.2f} seconds')
+
+
+# Convert predictions and true labels to numpy arrays
+predictions = np.array(predictions)
+true_labels = np.array(true_labels)
+
+# Calculate metrics
+precision = precision_score(true_labels, predictions, average='weighted')
+recall = recall_score(true_labels, predictions, average='weighted')
+f1 = f1_score(true_labels, predictions, average='weighted')
+accuracy = accuracy_score(true_labels, predictions)
+
+print(f'Precision: {precision:.4f}')
+print(f'Recall: {recall:.4f}')
+print(f'F1-score: {f1:.4f}')
+print(f'Accuracy: {accuracy:.4f}')
+
 
 
 plt.figure(figsize=(10,5))

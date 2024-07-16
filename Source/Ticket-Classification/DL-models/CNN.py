@@ -4,6 +4,8 @@ import numpy as np
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv1D, GlobalMaxPooling1D, Dense, Dropout, BatchNormalization, MaxPooling1D
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
+from sklearn.metrics import log_loss, precision_score, recall_score, f1_score, accuracy_score
+import time  # Import time module for measuring the time
 # Now you can import the module
 import sys
 import os
@@ -63,14 +65,17 @@ model.summary()
 early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=5, min_lr=0.0001) # type: ignore
 
+start_time = time.time()
+
+
 # Train the model
 history = model.fit(train_embeddings_resampled, train_labels_resampled_w2v, epochs=50, batch_size=128, 
           validation_data=(X_val, Y_val), callbacks=[early_stopping, reduce_lr]) 
 
-# Evaluate the model on the test data
-test_loss, test_accuracy = model.evaluate(test_embeddings, test_labels)
-print(f'Test Loss: {test_loss}')
-print(f'Test Accuracy: {test_accuracy}')
+
+end_time = time.time()
+training_time = end_time - start_time
+print(f'Training Time: {training_time:.2f} seconds')
 
 
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
@@ -83,11 +88,13 @@ predicted_labels = np.argmax(predictions, axis=1)
 true_labels_categorical = test_labels
 
 # Calculate metrics
+loss = log_loss(true_labels_categorical, predictions)
 precision = precision_score(true_labels_categorical, predicted_labels, average='weighted')
 recall = recall_score(true_labels_categorical, predicted_labels, average='weighted')
 f1 = f1_score(true_labels_categorical, predicted_labels, average='weighted')
 accuracy = accuracy_score(true_labels_categorical, predicted_labels)
 
+print(f'Test Loss: {loss:.4f}')
 print(f'Precision: {precision:.4f}')
 print(f'Recall: {recall:.4f}')
 print(f'F1-score: {f1:.4f}')
@@ -98,10 +105,10 @@ print(f'Accuracy: {accuracy:.4f}')
 plt.figure(figsize=(12, 6))
 plt.plot(history.history['loss'], label='Train Loss') # type: ignore 
 plt.plot(history.history['val_loss'], label='Validation Loss') # type: ignore
-plt.title(f'Training and Validation Loss - Test Accuracy: {test_accuracy}')
+plt.title(f'Training and Validation Loss - Test Accuracy: {accuracy}')
 plt.xlabel('Epochs')
 plt.ylabel('Loss')
 plt.legend()
 plt.grid(True)
-#plt.savefig('CNN_loss_plot.png')  # Save the plot as an image
+plt.savefig('CNN_loss_plot.png')  # Save the plot as an image
 plt.show()
