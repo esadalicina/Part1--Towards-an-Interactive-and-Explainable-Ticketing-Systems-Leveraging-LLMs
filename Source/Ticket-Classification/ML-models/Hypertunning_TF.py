@@ -65,37 +65,37 @@ def custom_scorer(estimator, X, y):
 
 # Define the classifiers to test
 classifiers = {
-    'NaiveBayes' : MultinomialNB(),
-    'RandomForest': RandomForestClassifier(),
-    'LogisticRegression': LogisticRegression(max_iter=3000),
-    'SVC': SVC(),
-    'DT': DecisionTreeClassifier()
+    #'NaiveBayes' : MultinomialNB(),
+    #'RandomForest': RandomForestClassifier(),
+    #'LogisticRegression': LogisticRegression(max_iter=3000),
+    'SVC': SVC()
+    #'DT': DecisionTreeClassifier()
     }
 
 
 # Define grid search parameters for different classifiers
 parameters = {
-    'NaiveBayes': {
-        'clf__alpha': [0.1, 0.5, 1.0, 5.0, 10.0]
-    },
-    'RandomForest': {
-        'clf__n_estimators': [100,200,500,700],
-        'clf__min_samples_leaf': [5,10,30],
-        'clf__max_depth': [None,10, 20, 30, 40]
-    },
-    'LogisticRegression': {
-        'clf__C': [0.01, 0.1, 1, 10],
-        'clf__penalty': ['l1'],
-        'clf__solver': ['liblinear','saga']
-    },
+    #'NaiveBayes': {
+    #    'clf__alpha': [0.1, 0.5, 1.0, 5.0, 10.0]
+    #},
+    #'RandomForest': {
+    #    'clf__n_estimators': [100,200,500,700],
+    #    'clf__min_samples_leaf': [5,10,30],
+    #    'clf__max_depth': [None,10, 20, 30, 40]
+    #},
+    #'LogisticRegression': {
+    #    'clf__C': [0.01, 0.1, 1, 10],
+    #    'clf__penalty': ['l1'],
+    #    'clf__solver': ['liblinear','saga']
+    #},
     'SVC': {
         'clf__C': [0.01, 0.1, 1, 10, 100],
         'clf__kernel': ['linear', 'rbf'],
         'clf__gamma': [1, 0.1, 0.01, 0.001, 0.0001]
-    },
-    'DT': {
-        'clf__max_depth': [None, 10, 20, 30]
     }
+    #'DT': {
+    #    'clf__max_depth': [None, 10, 20, 30]
+    #}
 }
 
 
@@ -181,6 +181,26 @@ for clf_name, clf in classifiers.items():
         plt.savefig(filename)  # Save the plot to a file
         plt.close()  # Close the plot to prevent it from displaying
 
+
+    
+    # Identify misclassified tickets
+    misclassified_tickets = []
+    for i, (text, true_label, pred_label) in enumerate(zip(test_texts, test_labels, test_predictions)): # type: ignore
+        if true_label != pred_label:
+            misclassified_tickets.append({
+                'Text': text,
+                'True Label': true_label,
+                'Predicted Label': pred_label
+            })
+
+    # Create a DataFrame for the misclassified tickets
+    misclassified_df = pd.DataFrame(misclassified_tickets)
+
+    # Save the misclassified tickets to a CSV file
+    misclassified_df.to_csv("/home/users/elicina/Master-Thesis/Diagrams/ML-Results/TF/misclassified_tickets.csv", index=False)
+
+
+
     # Evaluate the model performance
     accuracy = accuracy_score(test_labels, test_predictions)
     precision = precision_score(test_labels, test_predictions, average='weighted')
@@ -210,25 +230,25 @@ for clf_name, clf in classifiers.items():
     print(f'Classification Report:\n{report}\n')
 
     # Plot the confusion matrix
-    unique_classes = test_labels.unique()  # type: ignore # Get unique class labels from the test set
-    confusion_matrix_filename = os.path.join("/home/users/elicina/Master-Thesis/Diagrams/ML-Results/TF",f"{clf_name}.png")
-    plot_confusion_matrix(test_labels, test_predictions, unique_classes, confusion_matrix_filename)
+    #unique_classes = test_labels.unique()  # type: ignore # Get unique class labels from the test set
+    #confusion_matrix_filename = os.path.join("/home/users/elicina/Master-Thesis/Diagrams/ML-Results/TF",f"{clf_name}.png")
+    #plot_confusion_matrix(test_labels, test_predictions, unique_classes, confusion_matrix_filename)
 
 
 
     
 # Create a DataFrame for the results
-results_df = pd.DataFrame(results)
+#results_df = pd.DataFrame(results)
 
 # Save the results to a CSV file
-results_df.to_csv("/home/users/elicina/Master-Thesis/Diagrams/ML-Results/TF/TFResults.csv", index=False)
+#results_df.to_csv("/home/users/elicina/Master-Thesis/Diagrams/ML-Results/TF/TFResults.csv", index=False)
 
 # Display the results
-print(results_df)
+#print(results_df)
 
 # Save the best overall model, TF-IDF transformer, and tokenizer
-joblib.dump(best_overall_model.named_steps['clf'], '/home/users/elicina/Master-Thesis/Models/MLmodel/TF/modelML.pkl') # type: ignore
-joblib.dump(best_count_vect, '/home/users/elicina/Master-Thesis/Models/MLmodel/TF/count_vect.pkl')
-joblib.dump(best_tfidf_transformer, '/home/users/elicina/Master-Thesis/Models/MLmodel/TF/tfidf_transformer.pkl')
+#joblib.dump(best_overall_model.named_steps['clf'], '/home/users/elicina/Master-Thesis/Models/MLmodel/TF/modelML.pkl') # type: ignore
+#joblib.dump(best_count_vect, '/home/users/elicina/Master-Thesis/Models/MLmodel/TF/count_vect.pkl')
+#joblib.dump(best_tfidf_transformer, '/home/users/elicina/Master-Thesis/Models/MLmodel/TF/tfidf_transformer.pkl')
 
 

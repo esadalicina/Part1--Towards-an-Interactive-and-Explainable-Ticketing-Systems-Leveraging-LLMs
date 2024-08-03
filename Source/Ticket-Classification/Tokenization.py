@@ -42,10 +42,14 @@ X_train_tf, count_vect, tfidf_transformer = Tfidf_method(train_texts)
 X_test_tf, _, _ = Tfidf_method(test_texts, count_vect, tfidf_transformer)
 
 
+import matplotlib.pyplot as plt
+import numpy as np
+from collections import Counter
 
 # Handle class imbalance using SMOTE on TF-IDF features
 smote = SMOTE(random_state=42)
 X_train_tf_resampled, train_labels_resampled = smote.fit_resample(X_train_tf, train_labels) # type: ignore
+
 
 # ----------------------------------------------------------------- Tokenization with Word2Vec ----------------------------------------------------------
 
