@@ -66,9 +66,9 @@ def custom_scorer(estimator, X, y):
 # Define the classifiers to test
 classifiers = {
     #'NaiveBayes' : MultinomialNB(),
-    #'RandomForest': RandomForestClassifier(),
+    'RandomForest': RandomForestClassifier(),
     #'LogisticRegression': LogisticRegression(max_iter=3000),
-    'SVC': SVC()
+    #'SVC': SVC(),
     #'DT': DecisionTreeClassifier()
     }
 
@@ -83,16 +83,21 @@ parameters = {
     #    'clf__min_samples_leaf': [5,10,30],
     #    'clf__max_depth': [None,10, 20, 30, 40]
     #},
+    'RandomForest': {
+        'clf__n_estimators': [700],
+        'clf__min_samples_leaf': [5],
+        'clf__max_depth': [30]
+    }
     #'LogisticRegression': {
     #    'clf__C': [0.01, 0.1, 1, 10],
     #    'clf__penalty': ['l1'],
     #    'clf__solver': ['liblinear','saga']
     #},
-    'SVC': {
-        'clf__C': [0.01, 0.1, 1, 10, 100],
-        'clf__kernel': ['linear', 'rbf'],
-        'clf__gamma': [1, 0.1, 0.01, 0.001, 0.0001]
-    }
+    #'SVC': {
+    #    'clf__C': [0.01, 0.1, 1, 10, 100],
+    #    'clf__kernel': ['linear', 'rbf'],
+    #    'clf__gamma': [1, 0.1, 0.01, 0.001, 0.0001]
+    #},
     #'DT': {
     #    'clf__max_depth': [None, 10, 20, 30]
     #}
