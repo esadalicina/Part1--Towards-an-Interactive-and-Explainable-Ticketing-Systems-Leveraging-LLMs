@@ -24,6 +24,7 @@ label_data = df_clean['category_encoded']
 train_texts, test_texts, train_labels, test_labels = train_test_split(ticket_data, label_data, test_size=0.2, random_state=42, shuffle=True)
 
 
+
 # ----------------------------------------------------------------- Tokenization with Tfidf ----------------------------------------------------------
 
 def Tfidf_method(training_data, count_vect=None, tfidf_transformer=None):
@@ -41,7 +42,6 @@ def Tfidf_method(training_data, count_vect=None, tfidf_transformer=None):
 X_train_tf, count_vect, tfidf_transformer = Tfidf_method(train_texts)
 X_test_tf, _, _ = Tfidf_method(test_texts, count_vect, tfidf_transformer)
 
-
 import matplotlib.pyplot as plt
 import numpy as np
 from collections import Counter
@@ -51,6 +51,29 @@ import seaborn as sns
 # Handle class imbalance using SMOTE on TF-IDF features
 smote = SMOTE(random_state=42)
 X_train_tf_resampled, train_labels_resampled = smote.fit_resample(X_train_tf, train_labels) # type: ignore
+
+
+
+
+# Retrieve the first row text
+original_text_row = ticket_data.iloc[0]
+
+# Apply TF-IDF transformation to this text row
+X_tfidf_example, _, _ = Tfidf_method([original_text_row], count_vect, tfidf_transformer)
+
+# Convert the TF-IDF result to dense format
+example_dense = X_tfidf_example.toarray()
+
+# Get the feature names (words) from the CountVectorizer
+feature_names = count_vect.get_feature_names()
+
+# Create a DataFrame to show the TF-IDF values along with the feature names
+example_df = pd.DataFrame(example_dense, columns=feature_names)
+
+# Print the TF-IDF values for the example
+print("Original Text:", original_text_row)
+print(example_df.T.sort_values(by=0, ascending=False).head(100))  
+
 
 class_counts = Counter(train_labels_resampled)
 
@@ -64,5 +87,5 @@ plt.xlabel('Class')
 plt.ylabel('Number of Samples')
 plt.title('Number of Samples per Class After SMOTE')
 plt.xticks(classes) 
-plt.savefig("/home/users/elicina/Master-Thesis/smote.png") # Ensure x-ticks are labeled with class names
+#plt.savefig("/home/users/elicina/Master-Thesis/smote.png") # Ensure x-ticks are labeled with class names
 plt.show()
