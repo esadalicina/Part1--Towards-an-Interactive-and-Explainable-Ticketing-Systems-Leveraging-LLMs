@@ -77,7 +77,7 @@ model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_l
 
 # Define the training parameters
 batch_size = 32
-epochs = 3
+epochs = 50
 optimizer = torch.optim.AdamW(model.parameters(), lr=2e-5)
 
 # Create DataLoader for batch processing

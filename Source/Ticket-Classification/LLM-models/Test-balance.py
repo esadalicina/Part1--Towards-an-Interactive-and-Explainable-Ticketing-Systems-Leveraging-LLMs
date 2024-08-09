@@ -85,8 +85,8 @@ class_weights = class_weights.to(device)
 
 # Define the training parameters
 batch_size = 32
-epochs = 3
-optimizer = torch.optim.AdamW(model.parameters(), lr=2e-5)
+epochs = 50
+optimizer = torch.optim.AdamW(model.parameters(), lr=1e-5)
 
 # Create DataLoader for batch processing
 from torch.utils.data import DataLoader, TensorDataset
@@ -214,4 +214,4 @@ plt.xlabel('Epochs')
 plt.ylabel('Loss')
 plt.legend()
 plt.title('Training and Validation Loss')
-plt.savefig("BPlot.png")
+plt.savefig("BPlot_50.png")
