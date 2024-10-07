@@ -73,9 +73,9 @@ classifiers = {
 # Define grid search parameters for different classifiers
 parameters = {
     'SVC': {
-        'clf__C': [0.01, 0.1, 1, 10, 100],
-        'clf__kernel': ['linear', 'rbf'],
-        'clf__gamma': [1, 0.1, 0.01, 0.001, 0.0001]
+       'clf__C': [1],
+       'clf__kernel': ['rbf'],
+       'clf__gamma': [1]
     }
 }
 
@@ -142,13 +142,17 @@ for clf_name, clf in classifiers.items():
     # Function to plot confusion matrix
     def plot_confusion_matrix(y_true, y_pred, classes, filename):
         cm = confusion_matrix(y_true, y_pred)
+        # Sort the class labels explicitly
+        sorted_labels = sorted(classes)
         plt.figure(figsize=(10, 7))
-        sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=classes, yticklabels=classes)
+        sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", 
+                    xticklabels=sorted_labels,  # type: ignore
+                    yticklabels=sorted_labels) # type: ignore
         plt.xlabel('Predicted')
         plt.ylabel('Actual')
         plt.title('Confusion Matrix')
         plt.savefig(filename)  # Save the plot to a file
-        plt.close()  # Close the plot to prevent it from displaying
+        plt.close()
 
     # Identify misclassified tickets
     misclassified_tickets = []
@@ -168,7 +172,7 @@ for clf_name, clf in classifiers.items():
     misclassified_df = pd.DataFrame(misclassified_tickets)
 
     # Save the misclassified tickets to a CSV file
-    misclassified_df.to_csv("/home/users/elicina/Master-Thesis/Diagrams/ML-Results/TF/misclassified_tickets_SVM_Real.csv", index=False)
+    #misclassified_df.to_csv("/home/users/elicina/Master-Thesis/Diagrams/ML-Results/TF/misclassified_tickets_SVM_Real.csv", index=False)
 
     # Evaluate the model performance
     accuracy = accuracy_score(test_labels, test_predictions)
@@ -197,3 +201,8 @@ for clf_name, clf in classifiers.items():
     print(f'Recall: {recall}')
     print(f'F1 Score: {f1}')
     print(f'Classification Report:\n{report}\n')
+
+    # Plot the confusion matrix
+    unique_classes = test_labels.unique()  # type: ignore # Get unique class labels from the test set
+    confusion_matrix_filename = os.path.join("/home/users/elicina/Master-Thesis/",f"{clf_name}.png")
+    plot_confusion_matrix(test_labels, test_predictions, unique_classes, confusion_matrix_filename)
