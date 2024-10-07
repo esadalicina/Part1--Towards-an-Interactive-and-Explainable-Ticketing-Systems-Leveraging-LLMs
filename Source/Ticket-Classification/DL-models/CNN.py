@@ -1,12 +1,11 @@
-from matplotlib import pyplot as plt
-from sklearn.model_selection import train_test_split
-import numpy as np
-from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv1D, GlobalMaxPooling1D, Dense, Dropout, BatchNormalization, MaxPooling1D
-from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from sklearn.metrics import log_loss, precision_score, recall_score, f1_score, accuracy_score
-import time  # Import time module for measuring the time
-# Now you can import the module
+from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
+from sklearn.model_selection import train_test_split
+from tensorflow.keras.models import Sequential
+from matplotlib import pyplot as plt
+import numpy as np
+import time  
 import sys
 import os
 

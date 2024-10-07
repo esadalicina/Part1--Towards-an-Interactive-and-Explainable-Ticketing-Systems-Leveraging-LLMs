@@ -1,11 +1,12 @@
-import time
-from matplotlib import pyplot as plt
-from sklearn.model_selection import train_test_split
-import numpy as np
-from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv1D, GlobalMaxPooling1D, Dense, Dropout, Bidirectional, LSTM, BatchNormalization
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint
+from sklearn.model_selection import train_test_split
+from tensorflow.keras.models import Sequential
 from tensorflow.keras.regularizers import l2
+from matplotlib import pyplot as plt
+import numpy as np
+import time
+
 
 import sys
 import os
