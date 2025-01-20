@@ -92,6 +92,7 @@ Below are instructions on how to connect to the cluster and submit jobs for mode
 
 Create a shell script (train.sh) to train various models:
 
+```
 #!/bin/bash
 #SBATCH --job-name=model-training       # Job name
 #SBATCH --output=logs/train_out.txt     # Output log file
@@ -104,12 +105,13 @@ Create a shell script (train.sh) to train various models:
 # Load necessary modules (e.g., TensorFlow, PyTorch)
 module load python/3.8
 module load tensorflow/2.4.1            # Example for TensorFlow
+```
 
 # Activate the environment
-source /home/users/elicina/.virtualenvs/Master-Thesis/bin/activate
+-      source /home/users/elicina/.virtualenvs/Master-Thesis/bin/activate
 
 # Run the model training script
-python scripts/train_model.py --model BERT --epochs 5
+-      python scripts/train_model.py --model BERT --epochs 5
 
 
 ### To submit the training job:
