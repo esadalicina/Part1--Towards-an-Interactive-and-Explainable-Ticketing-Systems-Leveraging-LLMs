@@ -15,19 +15,18 @@ Public dataset: https://www.consumerfinance.gov/data-research/consumer-complaint
 ## Models Implemented
 
 ### Traditional Machine Learning Models
-- Support Vector Machine (SVM): Used for text classification based on feature extraction (e.g., TF-IDF).
-- Random Forest: A popular ensemble model for classifying ticketing data.
-- Logistic Regression: A baseline classifier for comparison.
+- Support Vector Machine (SVM)
+- Random Forest
+- Logistic Regression
   
 ### Traditional Deep Learning Models
 
 ### Large Language Models (LLMs)
-- BERT (Bidirectional Encoder Representations from Transformers): Pre-trained transformer model fine-tuned on ticketing data for classification tasks.
-- GPT (Generative Pre-trained Transformer): Used for generating ticket descriptions and improving classification through fine-tuning.
+- BERT (Bidirectional Encoder Representations from Transformers)
 
 ## Model Optimization
 - Grid Search & Random Search: Hyperparameter tuning techniques used for optimizing traditional models.
-- HuggingFace: Pretrained LLM models were used on our dataset
+- HuggingFace: Pretrained LLM models were used on our dataset from the HuggingFace company (https://huggingface.co/models) 
 
 ### The performance of each model is evaluated based on:
 
