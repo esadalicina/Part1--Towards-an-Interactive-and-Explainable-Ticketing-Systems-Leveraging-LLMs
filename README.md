@@ -10,19 +10,26 @@ Public dataset: https://www.consumerfinance.gov/data-research/consumer-complaint
 ## The repository consists of two main sections:
 
 - Data Preprocessing and Analysis: Steps to clean, preprocess, and transform ticketing data for model training.
-- Model Training and Comparison: Implementation of multiple classification models, including traditional approaches (e.g., SVM, Random Forest, CNN) and Large Language Models (e.g., BERT, RoBerta, XNet), with a focus on hyperparameter optimization and explainability techniques.
+- Model Training and Comparison: Implementation of multiple classification models, including traditional approaches, deep learning models and Language Models, with a focus on hyperparameter optimization and explainability techniques.
 
 ## Models Implemented
 
 ### Traditional Machine Learning Models
 - Support Vector Machine (SVM)
-- Random Forest
-- Logistic Regression
+- Random Forest (RF)
+- Logistic Regression (LR)
+- NaiveBayes (NB)
+- Decision Tree (DT)
   
 ### Traditional Deep Learning Models
+- Convolutional Neural Networks (CNN) 
+- Hierarchical Neural Networks (HNN)
+- Recurrent Neural Networks (RNN)
 
 ### Large Language Models (LLMs)
-- BERT (Bidirectional Encoder Representations from Transformers)
+- Bidirectional Encoder Representations from Transformers (BERT)
+- Robustly Optimized BERT Pretraining Approach (RoBerta)
+- Cross Network for Text Classification (XNet)
 
 ## Model Optimization
 - Grid Search & Random Search: Hyperparameter tuning techniques used for optimizing traditional models.
@@ -32,6 +39,7 @@ Public dataset: https://www.consumerfinance.gov/data-research/consumer-complaint
 
 - Accuracy: Correctly classified tickets.
 - F1-Score: Balance between precision and recall.
+- Time: The training and testing time
 - Explainability: Techniques such as SHAP (SHapley Additive exPlanations) are used to explain model decisions for ticket classification.
 The results and comparison charts are stored in the results/ directory.
 
