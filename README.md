@@ -3,8 +3,9 @@
 ## Data Preprocessing and Model Training for automated ticket (text) classification 
 
 This repository contains the code, data, and resources for Part 1 of the master thesis titled "Towards an Interactive and Explainable Ticketing System Leveraging Large Language Models (LLMs)". 
-The project focuses on data preprocessing, model training, and optimization for classifying ticketing system data. 
+The repository focuses on data preprocessing, model training, and optimization for classifying ticketing system data. 
 It compares a variety of machine learning models, including traditional algorithms and modern LLMs to improve system performance.
+If you seek for more clearity and information, you are welcome to have a look over the report and videos (Folder: Master Thesis Report and Video/) 
 
 Public dataset: https://www.consumerfinance.gov/data-research/consumer-complaints/
 
