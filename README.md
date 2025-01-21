@@ -67,7 +67,7 @@ Before getting started, ensure you have the following installed:
 
 - Python (>= 3.8)
 - Visual Studio Code: Recommended for easier code management and Git integration in HPC
-- HPC Access: Iris Cluster for running high-performance jobs
+- HPC Access: Iris Cluster for running high-performance jobs (https://ulhpc-tutorials.readthedocs.io/en/latest/)
 - Visual Studio Code: Installed on your local machine.
 - Remote - SSH extension in VSC: To connect to the Iris Cluster from VSC. SSH Access to the Iris Cluster (HPC).
 - Git installed on the HPC (usually available by default, but you can check by running git --version).
