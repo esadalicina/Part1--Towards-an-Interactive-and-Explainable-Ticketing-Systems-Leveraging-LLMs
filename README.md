@@ -43,7 +43,7 @@ GitHub of Master Thesis Part 2: https://github.com/esadalicina/Part2--Towards-an
 - Word to vector (W2V)
 - Term Frequency-Inverse Document Frequency (Tf-idf)
 
-### The performance of each model is evaluated based on:
+## The performance of each model is evaluated based on:
 
 - Accuracy: Correctly classified tickets.
 - F1-Score: Balance between precision and recall.
