@@ -7,6 +7,7 @@ The project focuses on data preprocessing, model training, and optimization for 
 It compares a variety of machine learning models, including traditional algorithms and modern LLMs to improve system performance.
 
 Public dataset: https://www.consumerfinance.gov/data-research/consumer-complaints/
+
 GitHub of Master Thesis Part 2: https://github.com/esadalicina/Part2--Towards-an-Interactive-and-Explainable-Ticketing-Systems-Leveraging-LLMs
 
 
