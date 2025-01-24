@@ -9,9 +9,9 @@ If you seek for more clearity and information, you are welcome to have a look ov
 
 Public dataset: https://www.consumerfinance.gov/data-research/consumer-complaints/
 
-Master Thesis Part 2 - Focus lies on the backend and frontend of the Ticketing System: https://github.com/esadalicina/Part2--Towards-an-Interactive-and-Explainable-Ticketing-Systems-Leveraging-LLMs
+Master Thesis Part 2 - The focus is on both the backend and frontend of the Ticketing System: https://github.com/esadalicina/Part2--Towards-an-Interactive-and-Explainable-Ticketing-Systems-Leveraging-LLMs
 
-Master Thesis Part 3 - Focus lies on the integrated Discord Community with task-specific Bots: https://github.com/esadalicina/part-3.git
+Master Thesis Part 3 - The focus is on the integration of a Discord community with task-specific bots: https://github.com/esadalicina/part-3.git
 
 
 ## The repository consists of two main sections:
