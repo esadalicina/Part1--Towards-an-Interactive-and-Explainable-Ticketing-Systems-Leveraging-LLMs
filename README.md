@@ -11,12 +11,11 @@ Public dataset: https://www.consumerfinance.gov/data-research/consumer-complaint
 
 Master Thesis Part 2 - The focus is on both the backend and frontend of the Ticketing System: 
 
-https://github.com/esadalicina/Part2--Towards-an-Interactive-and-Explainable-Ticketing-Systems-Leveraging-LLMs
+https://github.com/esadalicina/Part2--Towards-an-Interactive-and-Explainable-Ticketing-Systems-Leveraging-LLMs.git
 
-Master Thesis Part 3 - The focus is on the integration of a Discord community with task-specific bots: 
+Master Thesis Part 3 - This repository involves integrating a Discord community with task-specific bots:
 
 https://github.com/esadalicina/Part3--Towards-an-Interactive-and-Explainable-Ticketing-Systems-Leveraging-LLMs.git
-
 
 ## The repository consists of two main sections:
 
