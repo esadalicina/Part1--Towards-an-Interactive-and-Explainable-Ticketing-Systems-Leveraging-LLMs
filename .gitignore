@@ -1,7 +1,7 @@
 Miniconda3-latest-Linux-x86_64.sh
 # Ignore all .out files
 *.out
-
+.env
 # Other patterns to ignore
 node_modules/
 *.log
